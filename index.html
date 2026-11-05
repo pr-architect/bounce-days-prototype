@@ -534,7 +534,7 @@ function homeEntry(){
       <div class="fan"><div class="f1"><span>💳</span>Ride now, pay later</div><div class="f2"><span>🎉</span>Free Extension</div><div class="f3"><span>🔑</span>Hold your EV</div></div>
     </button>`;
   if(HV==='C') return `<div class="bd2">
-      <button class="top" data-a="openBen">${bdIcon()}<span style="flex:1"><span class="num">${DAYS} Bounce Days</span><span class="tag">Every rental day earns benefits</span></span><span class="all" aria-label="See all benefits">›</span></button>
+      <button class="top" data-a="openBen">${bdIcon()}<span style="flex:1"><span class="num">${DAYS} Bounce Days</span><span class="tag">Every rental day, earns benefits</span></span><span class="all" aria-label="See all benefits">›</span></button>
       <div class="trio">
         ${['hold','ext','bnpl'].map(k=>{const b=BEN[k];return `<button class="tc" data-a="openDetail" data-v="${k}"><span class="em">${b.e}</span><b>${b.sn}</b></button>`}).join('')}
         <button class="tc more" data-a="openBen"><span class="stack"><span>🎽</span><span>📅</span><span>🏍️</span></span><b>+${Object.keys(BEN).length-3} more ›</b></button>
