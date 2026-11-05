@@ -471,7 +471,7 @@ const BEN = {
     cta:'Hold my EV for ₹150', ctaNote:'₹150 instead of ₹300',
     steps:['Tap the button and pick the day','Pay ₹150 instead of ₹300','Your EV stays with you, locked','Recharge anytime to unlock and ride'],
     rules:['You get 1 hold day every 15 days','Save up to 3 hold days','Hold days count towards your Bounce Days']},
-  unlock: {sn:'2 hr unlock', e:'⏱️', c:'green', name:'Unlock for 2 hrs, return EV', short:'Use to return to the nearest hub within 2 hrs.', u:0, t:1, ms:60,
+  unlock: {sn:'2 hr unlock', e:'⏱️', c:'green', name:'2 hrs EV unlock', sheetName:'Unlock for 2 hrs, return EV', short:'Use to return to the nearest hub within 2 hrs.', u:0, t:1, ms:60,
     about:'Done riding, or can\'t recharge? Unlock your EV for 2 hours and return it at the nearest hub.',
     cta:'Unlock for 2 hrs', ctaNote:'Free. Return within 2 hours.',
     steps:['Tap unlock','Ride to the nearest hub','Return the EV within 2 hours'],
@@ -491,6 +491,19 @@ const BEN = {
     cta:'Get collection code', ctaNote:'Show the code at your hub',
     steps:['Tap to get your collection code','Visit your hub','Show the code and collect your jacket'],
     rules:['One per rider','Collect within 30 days of unlocking']},
+  holder: {sn:'Mobile holder', e:'📱', c:'gold', name:'Mobile Holder', short:'Collected on 2 Jun', u:1, t:1, ms:15,
+    about:'A Bounce mobile holder for your EV, so you can follow orders and maps while riding.',
+    cta:'Get collection code', ctaNote:'Show the code at your hub',
+    steps:['Unlocked at Day 15','Collect it at your hub'], rules:['One per rider']},
+  helmet: {sn:'Helmet', e:'⛑️', c:'gold', name:'Rider Helmet', short:'Yours to keep', u:0, t:1, ms:105,
+    about:'A Bounce rider helmet, yours to keep. Collect it at your hub.',
+    cta:'Get collection code', ctaNote:'Show the code at your hub',
+    steps:['Tap to get your collection code','Visit your hub','Show the code and collect your helmet'],
+    rules:['One per rider','Collect within 30 days of unlocking']},
+  gold: {sn:'Gold coins', e:'🪙', c:'gold', name:'Gold Coins', short:'Digital gold in your savings', ms:150, locked:true,
+    about:'Bounce adds digital gold to your savings in the app. It stays yours, even on a break.',
+    steps:['Reach Day 150','Gold is added to your savings automatically','See it in Wallet'],
+    rules:['Unlocks on Day 150','Added once you unlock it']},
   raincoat: {e:'🧥', c:'gold', name:'Bounce raincoat', short:'Collected on 4 Jul', u:1, t:1, qty:'✓', unit:'collected', ms:30, used:true,
     about:'A Bounce raincoat for the monsoon. You collected yours on 4 Jul.',
     steps:['Unlocked at Day 30','Collected at your hub'], rules:['One per rider']},
@@ -504,7 +517,7 @@ const BEN = {
     rules:['Unlocks on Day 365','Terms shared before you switch']},
 };
 
-const SPECIAL = {30:['raincoat'], 60:['unlock'], 90:['bnpl','jacket'], 120:['ext'], 180:['emi'], 365:['own']};
+const SPECIAL = {15:['holder'], 30:['raincoat'], 60:['unlock'], 90:['bnpl','jacket'], 105:['helmet'], 120:['ext'], 150:['gold'], 180:['emi'], 365:['own']};
 const MS = [];
 for(let d=15; d<=360; d+=15) MS.push({d, items:[['hold','+1 day'], ...(SPECIAL[d]||[]).map(k=>[k,'New'])]});
 MS.push({d:365, items:SPECIAL[365].map(k=>[k,'New'])});
@@ -580,7 +593,7 @@ function optionsSheet(){
       <p>Your ${DAYS} Bounce Days will also reset to 0, along with removing all your available benefits.</p>
     </div></div>
     <div class="grp2">${DAYS} Bounce Days earned benefits</div>
-    ${[['unlock','use'],['bnpl','day'],['hold','day'],['ext','day']].map(([k,unit])=>{const b=BEN[k], n=b.t-b.u;return `<button class="bi opt" data-a="openDetail" data-v="${k}"><span class="em c-${b.c}">${b.e}</span><span class="tx"><b>${b.name}</b><small>${b.short}</small></span><span class="q"><strong>${n}</strong><span>${unit}${n===1?'':'s'} left</span></span><span class="arr">›</span></button>`}).join('')}
+    ${[['unlock','use'],['bnpl','day'],['hold','day'],['ext','day']].map(([k,unit])=>{const b=BEN[k], n=b.t-b.u;return `<button class="bi opt" data-a="openDetail" data-v="${k}"><span class="em c-${b.c}">${b.e}</span><span class="tx"><b>${b.sheetName||b.name}</b><small>${b.short}</small></span><span class="q"><strong>${n}</strong><span>${unit}${n===1?'':'s'} left</span></span><span class="arr">›</span></button>`}).join('')}
   </div>`;
 }
 
