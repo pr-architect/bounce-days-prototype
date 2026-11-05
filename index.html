@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Bounce Days prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#D42B30; --pink:#EEA1A3; --pink-bg:#FDECEC;
+    --green:#178040; --green-bg:#E3F3E8;
+    --gold:#8A5A00; --gold-bg:#FFF5E1; --gold-line:#F0D49A; --gold-dot:#D9951B;
+    --h:#2B2B2B; --b:#5E5E5E; --s:#8A8A8A; --line:#ECEAE7; --app:#F2F2F2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Hanken Grotesk",system-ui,sans-serif;background:#E9E7E3;color:var(--h);line-height:1.2;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;gap:40px;padding:36px 24px}
+  button{font:inherit;border:0;background:none;cursor:pointer;color:inherit;text-align:inherit}
+  .side{width:300px;padding-top:30px}
+  .side h1{font-size:20px;font-weight:800}
+  .side p{font-size:14px;color:#555;margin-top:10px;line-height:1.4}
+  .side .ph{margin-top:16px;font-size:13px;color:var(--gold);background:var(--gold-bg);border:1px solid var(--gold-line);padding:8px 11px;border-radius:9px}
+  .side a{display:inline-block;margin-top:16px;font-size:13.5px;color:var(--red);font-weight:600}
+  .side button{display:block;margin-top:12px;font-size:13.5px;color:var(--red);font-weight:600;text-decoration:underline}
+
+  /* phone */
+  .phone{width:390px;height:844px;border-radius:52px;border:10px solid #1c1c1e;background:var(--app);overflow:hidden;position:relative;box-shadow:0 18px 40px rgba(0,0,0,.18);flex:none}
+  .cam{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;background:#111;z-index:60}
+  .scr{position:absolute;inset:0;overflow-y:auto;padding:44px 16px 96px;scrollbar-width:none}
+  .scr::-webkit-scrollbar{display:none}
+  .scr.locked{overflow:hidden}
+  .scr.detail{padding-bottom:110px}
+  .nav{position:absolute;left:0;right:0;bottom:0;height:78px;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding-top:12px;z-index:20}
+  .nav div{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11.5px;color:#8A8A8A}
+  .nav div.on{color:var(--red);font-weight:600}
+  .nav i{width:22px;height:18px;border:2px solid currentColor;border-radius:5px;display:block}
+  .toast{position:absolute;left:16px;right:16px;bottom:96px;background:#222;color:#fff;font-size:13.5px;padding:11px 14px;border-radius:12px;z-index:70;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.on{opacity:1}
+
+  /* home */
+  .hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .coin{display:flex;align-items:center;gap:7px;background:#FFF8E8;border:1px solid #F2DDB0;border-radius:24px;padding:5px 12px 5px 5px;font-weight:600;color:#7A5200;font-size:15px}
+  .coin b{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFD66B,#E89B0C);color:#8A4B00;display:grid;place-items:center;font-size:13px}
+  .ico{width:44px;height:44px;border-radius:14px;background:#fff;display:grid;place-items:center;color:var(--red);font-weight:800}
+  .sp{flex:1}
+  .banner{height:150px;border-radius:18px;background:linear-gradient(110deg,#FFF7EE 0 52%,#F4D8B8 100%);padding:16px;position:relative;overflow:hidden}
+  .banner b{font-size:30px;font-weight:800;letter-spacing:-1px;color:var(--red)}
+  .banner b span{color:#1c1c1c}
+  .banner p{font-size:13px;font-weight:700;margin-top:4px;color:#222;width:58%}
+  .banner em{position:absolute;left:16px;bottom:14px;background:var(--red);color:#fff;font-style:normal;font-size:10px;font-weight:700;padding:5px 9px;border-radius:5px}
+  .banner .scooter{position:absolute;right:-6px;bottom:-4px;font-size:84px}
+  .dots{display:flex;justify-content:center;gap:4px;margin:8px 0 10px}
+  .dots i{width:6px;height:5px;border-radius:3px;background:#ccc}.dots i.on{width:20px;background:#555}
+  .card{background:#fff;border-radius:22px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .row{display:flex;align-items:center;gap:10px}
+  .chip{display:inline-block;font-size:13px;font-weight:500;padding:5px 10px;border-radius:14px;white-space:nowrap}
+  .chip.warn{background:#FFF1E2;color:#9A4A12}
+  .chip.gold{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-line)}
+  .chip.green{background:var(--green-bg);color:var(--green)}
+  .chip.grey{background:#F0EFED;color:#777}
+  .lnk{color:var(--red);font-weight:600;font-size:15px}
+  .ends{font-size:18px;font-weight:700;margin-top:14px}
+  .sub{font-size:14px;color:var(--b);margin-top:6px}
+  .gauge{width:92px;height:80px;position:relative;margin-top:6px;flex:none}
+  .gauge strong{position:absolute;left:0;top:26px;width:100%;text-align:center;font-size:22px;font-weight:700}
+  .gauge small{position:absolute;left:0;top:52px;width:100%;text-align:center;font-size:11px;color:var(--red)}
+  .lock{display:flex;justify-content:space-between;font-size:14px;margin-top:14px}
+  .lock span:first-child{color:var(--green);font-weight:600}
+  .lock span:last-child{color:var(--b)}
+  .bar{height:4px;border-radius:2px;background:#EEE;margin-top:8px;overflow:hidden}
+  .bar i{display:block;height:100%;background:#C7892E}
+  .cta{display:block;width:100%;background:var(--red);color:#fff;font-weight:600;font-size:16px;padding:16px;border-radius:16px;text-align:center;margin-top:16px}
+  .cta[disabled]{background:#E4E1DD;color:#8a8a8a;pointer-events:none}
+  .tiles{display:flex;gap:12px;margin-top:14px}
+  .tile{flex:1;height:70px;border-radius:16px;display:flex;align-items:center;gap:10px;padding:0 14px;font-weight:600;font-size:15px}
+  .tile.earn{background:linear-gradient(120deg,#FBEBD3,#F6DDB8);color:#B0601A;border:1px solid #EFD3A8}
+  .tile.ref{background:linear-gradient(120deg,#E3F0E3,#D3E8D6);color:#2F6A3C;border:1px solid #C7DFCB}
+  .tile span{font-size:26px}
+  .ten-strip{margin-top:14px;padding:12px;border-radius:14px;background:var(--gold-bg);border:1px solid var(--gold-line);display:flex;align-items:center;gap:10px;cursor:pointer;width:100%}
+  .medal{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE59A,#E2A422);display:grid;place-items:center;font-size:12px;font-weight:800;color:#6B3F00;flex:none}
+  .ten-strip b{font-size:15px;color:var(--gold)}
+  .ten-strip small{display:block;font-size:12.5px;color:#7a6440;margin-top:3px}
+  .mini{height:5px;border-radius:3px;background:#F3E3BF;margin-top:7px;overflow:hidden}
+  .mini i{display:block;height:100%;background:var(--gold-dot);border-radius:3px}
+
+  /* Bounce days icon */
+  .bdi{width:44px;height:44px;border-radius:14px;background:var(--red);color:#fff;display:grid;place-items:center;flex:none;position:relative}
+  .bdi svg{width:26px;height:26px}
+  .bdi.sm{width:38px;height:38px;border-radius:12px}.bdi.sm svg{width:22px;height:22px}
+  .active{background:#E6F4EA;color:#1E7A3E}
+  .stack{display:flex}
+  .stack span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:14px;border:2px solid #fff;margin-left:-8px}
+  .stack span:first-child{margin-left:0}
+
+  /* A: in-card strip */
+  .eA{display:flex;align-items:center;gap:12px;width:100%;margin-top:16px;padding-top:14px;border-top:1px dashed #EBDADA}
+  .eA b{font-size:16px;display:block}
+  .eA small{font-size:12.5px;color:var(--b);display:block;margin-top:3px;line-height:1.3}
+
+  /* B: rewards banner with fanned cards */
+  .eB{margin-top:14px;border-radius:22px;padding:18px;background:linear-gradient(140deg,#D42B30,#B51F27 60%,#9C1820);color:#fff;position:relative;overflow:hidden;width:100%;display:block;min-height:168px}
+  .eB .k{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);border-radius:12px;padding:5px 9px 5px 6px;font-size:12.5px;font-weight:700}
+  .eB .k svg{width:18px;height:18px}
+  .eB h3{font-size:21px;font-weight:800;line-height:1.15;margin-top:10px;width:54%;letter-spacing:-.3px;position:relative;z-index:1}
+  .eB p{font-size:13px;opacity:.88;margin-top:6px;width:54%;line-height:1.35;position:relative;z-index:1}
+  .eB .go{display:inline-block;margin-top:12px;background:#fff;color:var(--red);font-weight:700;font-size:13.5px;padding:8px 12px;border-radius:12px}
+  .fan{position:absolute;right:8px;top:34px;width:132px;height:130px}
+  .fan div{position:absolute;width:80px;height:100px;border-radius:15px;padding:9px;display:flex;flex-direction:column;justify-content:flex-end;font-size:11.5px;font-weight:700;line-height:1.15;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+  .fan div span{font-size:24px;margin-bottom:auto}
+  .fan .f1{left:0;top:16px;transform:rotate(-12deg);background:linear-gradient(150deg,#EAF6EE,#CFEAD8);color:#185C33}
+  .fan .f2{left:24px;top:4px;transform:rotate(-1deg);background:linear-gradient(150deg,#EEF1FB,#D5DDF5);color:#2D3E7A}
+  .fan .f3{left:48px;top:14px;transform:rotate(11deg);background:linear-gradient(150deg,#FFF6E2,#FFE6B0);color:#7A4A00}
+  .tw{position:absolute;color:#FFD27A;font-size:16px}
+
+  /* C: benefit shelf */
+  .eC{margin-top:14px;background:#fff;border-radius:22px;padding:16px 0 16px 16px}
+  .eC .hd{display:flex;align-items:center;gap:10px;padding-right:16px}
+  .eC .hd b{font-size:16px;display:block}
+  .eC .hd small{font-size:12.5px;color:var(--b);display:block;margin-top:2px}
+  .shelf{display:flex;gap:10px;overflow-x:auto;margin-top:14px;padding-right:16px;scrollbar-width:none}
+  .shelf::-webkit-scrollbar{display:none}
+  .sc{flex:none;width:112px;border-radius:16px;padding:12px;border:1px solid;display:flex;flex-direction:column;min-height:112px}
+  .sc .em{font-size:24px}
+  .sc b{font-size:13.5px;margin-top:auto;line-height:1.2}
+  .sc small{font-size:12px;margin-top:3px;font-weight:600;opacity:.8}
+  .sc.more{background:#FFF5F5;border:1.5px dashed #F0B3B4;color:var(--red);justify-content:center;align-items:center;text-align:center;font-weight:700;font-size:13.5px}
+  .s-red{background:linear-gradient(150deg,#FFF0F0,#FFE0E0);border-color:#F5C4C5;color:#9A2226}
+  .s-green{background:linear-gradient(150deg,#EAF6EE,#D8EEDF);border-color:#BFDFCA;color:#185C33}
+  .s-gold{background:linear-gradient(150deg,#FFF6E2,#FFEBC4);border-color:#F0D49A;color:#7A4A00}
+  .s-blue{background:linear-gradient(150deg,#EEF1FB,#DFE5F7);border-color:#C8D2EE;color:#2D3E7A}
+
+  /* Bounce Days card (chosen) */
+  .bd{margin-top:14px;background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .bd .band{display:block;width:100%;padding:16px 16px 14px;background:linear-gradient(140deg,#FFF4F4,#FFDCDC);position:relative;overflow:hidden}
+  .bd .band .tw{position:absolute;color:#F0A63A}
+  .bd .top{display:flex;align-items:center;gap:12px}
+  .bd .num{font-size:30px;font-weight:800;letter-spacing:-1px;color:#9A2226;line-height:1}
+  .bd .num small{font-size:15px;font-weight:700;letter-spacing:0;margin-left:5px;color:#9A2226}
+  .bd .tag{font-size:13px;color:#8E4A4C;margin-top:5px;line-height:1.3}
+  .bd .bot{display:flex;align-items:center;margin-top:14px}
+  .bd .ready{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:700;color:#185C33;flex:1}
+  .bd .ready i{width:8px;height:8px;border-radius:50%;background:#2FA35A;box-shadow:0 0 0 4px rgba(47,163,90,.18)}
+  .bd .see{background:var(--red);color:#fff;font-weight:700;font-size:14px;padding:9px 14px;border-radius:12px}
+  .mshelf{display:flex;gap:8px;overflow-x:auto;padding:12px 16px 14px;scrollbar-width:none}
+  .mshelf::-webkit-scrollbar{display:none}
+  .mc{flex:none;width:76px;border-radius:14px;padding:9px 8px;border-width:1px;border-style:solid;position:relative;text-align:left}
+  .mc .em{font-size:19px;display:block}
+  .mc b{display:block;font-size:12px;line-height:1.15;margin-top:6px}
+  .mc .qb{position:absolute;right:6px;top:6px;min-width:20px;height:20px;border-radius:10px;background:#fff;font-size:11.5px;font-weight:800;display:grid;place-items:center;padding:0 5px}
+  .mc.more{background:#FAF8F6;border:1.5px dashed #DDD6CF;color:#777;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;font-weight:700}
+
+  /* plain Bounce Days card */
+  .bd2{margin-top:14px;background:#fff;border-radius:22px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .bd2 .top{display:flex;align-items:center;gap:12px;width:100%}
+  .bd2 .num{font-size:20px;font-weight:700;color:var(--h);line-height:1.2}
+  .bd2 .tag{display:block;font-size:14px;color:var(--b);margin-top:6px;line-height:1.2}
+  .bd2 .all{width:32px;height:32px;border-radius:50%;background:#F3F1EE;display:grid;place-items:center;color:var(--h);font-weight:700;font-size:16px;flex:none;margin-left:auto}
+  .trio{display:flex;gap:8px;margin:14px -16px 0 0;padding-right:16px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}
+  .trio::-webkit-scrollbar{display:none}
+  .tc{flex:none;width:92px;scroll-snap-align:start;border-radius:14px;padding:10px;background:#F7F5F2;border:1px solid #EEEAE5;position:relative;text-align:left;min-width:0}
+  .tc .em{font-size:19px;display:block}
+  .tc.more{background:#fff;border:1.5px dashed #DDD6CF}
+  .tc.more .stack span{width:22px;height:22px;font-size:11px;background:#F7F5F2;border-color:#fff}
+  .tc.more b{color:var(--red)}
+  .tc b{display:block;font-size:14px;font-weight:600;line-height:1.2;margin-top:6px;color:var(--h)}
+  .tc small{display:block;font-size:11.5px;color:var(--s);margin-top:2px}
+
+  /* one colour for every benefit (overrides the multi-colour classes) */
+  .c-red,.c-green,.c-gold,.c-blue{background:#F7F5F2 !important}
+  .h-red,.h-green,.h-gold,.h-blue{background:#fff !important;border-color:#EEEAE5 !important;color:var(--h) !important}
+
+  /* benefits screen */
+  .trk{position:relative;display:flex;margin-top:22px}
+  .trk .line{position:absolute;top:10px;height:3px;border-radius:2px;background:#E2DFDB}
+  .trk .fill{position:absolute;left:0;top:0;height:100%;background:var(--green);border-radius:2px}
+  .trk .you{position:absolute;top:-4px;width:11px;height:11px;border-radius:50%;background:var(--h);box-shadow:0 0 0 3px #fff;transform:translateX(-50%)}
+  .trk .you span{position:absolute;bottom:15px;left:50%;transform:translateX(-50%);font-size:11.5px;font-weight:700;color:var(--h)}
+  .nd{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1}
+  .nd i{width:23px;height:23px;border-radius:50%;background:#fff;border:2px solid #D6D2CD;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:800;color:#fff}
+  .nd.done i{background:var(--green);border-color:var(--green)}
+  .nd .lb{display:flex;align-items:center;gap:3px;margin-top:7px;font-size:14px;font-weight:600;color:var(--s)}
+  .nd.done .lb{color:var(--h)}
+  .nd .lb em{display:inline-flex;color:var(--s);transition:transform .15s}
+  .nd .lb em svg{width:10px;height:10px}
+  .nd.open .lb em{transform:rotate(180deg);color:var(--h)}
+  .nd.open .lb{color:var(--h)}
+  .xp{position:relative;margin-top:12px;background:#F7F5F2;border-radius:14px;padding:12px;animation:xin .16s ease-out}
+  @keyframes xin{from{opacity:.4;transform:translateY(-4px)}to{opacity:1;transform:none}}
+  .xp .caret{position:absolute;top:-6px;width:12px;height:12px;background:#F7F5F2;transform:translateX(-50%) rotate(45deg);border-radius:2px}
+  .xh{display:flex;align-items:center;gap:8px}
+  .xh b{font-size:15px;font-weight:700}
+  .xr{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .xc{flex:none;display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #EEEAE5;border-radius:12px;padding:7px 9px;font-size:13px;font-weight:600;white-space:nowrap}
+  .howlink{display:inline-block;margin-top:14px;font-size:14px;font-weight:600;color:var(--red)}
+  .bi .q2{font-size:14px;font-weight:600;color:var(--b);flex:none}
+  .bi.locked .q2{color:#B3B0AC}
+  .flash{animation:flash 1.2s ease-out}
+  @keyframes flash{0%{box-shadow:0 0 0 3px #F6C9CA}100%{box-shadow:0 0 0 0 transparent}}
+
+  /* scrollable 15-day track */
+  .trkS{margin:20px -16px 0;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 28px,#000 calc(100% - 28px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 28px,#000 calc(100% - 28px),transparent 100%)}
+  .trkS::-webkit-scrollbar{display:none}
+  .trkS .in{position:relative;display:flex;padding:18px 0 2px}
+  .trkS .line{position:absolute;top:28px;height:3px;border-radius:2px;background:#E2DFDB}
+  .trkS .fill{position:absolute;left:0;top:0;height:100%;background:var(--green);border-radius:2px}
+  .trkS .you{position:absolute;top:-4px;width:11px;height:11px;border-radius:50%;background:var(--h);box-shadow:0 0 0 3px #fff;transform:translateX(-50%)}
+  .trkS .you span{position:absolute;bottom:15px;left:50%;transform:translateX(-50%);font-size:11.5px;font-weight:700;color:var(--h)}
+  .trkS .nd{flex:none;width:78px}
+  .ib{width:22px;height:22px;border-radius:50%;border:1.5px solid #CFCBC6;color:#8A8A8A;font-size:12px;font-weight:700;font-style:italic;font-family:Georgia,serif;display:grid;place-items:center;flex:none}
+  .pop2{position:absolute;left:16px;right:16px;background:#fff;border-radius:20px;padding:14px 4px 6px;z-index:31;box-shadow:0 14px 34px rgba(0,0,0,.25);animation:drop .16s ease-out}
+  .pop2 .caret{position:absolute;top:-6px;width:13px;height:13px;background:#fff;transform:translateX(-50%) rotate(45deg);border-radius:2px}
+  .pop2 .ph{display:flex;align-items:center;gap:8px;padding:0 12px 6px}
+  .pop2 .ph h4{font-size:18px;font-weight:700}
+  .pop2 .x{margin-left:auto;width:30px;height:30px;border-radius:50%;background:#F1F1F1;font-size:14px;color:#666;display:grid;place-items:center}
+  .pop2 .bi{padding:12px}
+
+  /* plan expired */
+  .ttl{font-size:21px;font-weight:700;line-height:1.25}
+  .lockic{font-size:44px;line-height:1}
+  .warn{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:12px;border-radius:14px;background:#FFF6E0;border:1px solid #F2DFB0;font-size:14px;color:#6B4A10;line-height:1.35}
+  .warn b{color:#5A3A00}
+  .opcard{margin-top:14px;background:#fff;border-radius:22px;padding:16px 0 4px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .opcard h4{font-size:17px;font-weight:700;padding:0 16px 4px}
+  .opcard .bi{padding:12px 16px}
+  .help{margin-top:14px;background:#fff;border-radius:22px;width:100%}
+  .help .bi{padding:14px 16px}
+  .retl{display:block;width:100%;text-align:center;margin-top:16px;font-size:14.5px;font-weight:600;color:var(--b)}
+  .retl span{color:var(--red)}
+
+  /* expired: positive home + options sheet */
+  .okline{display:flex;gap:8px;align-items:center;margin-top:14px;padding:11px 12px;border-radius:14px;background:var(--green-bg);color:#14562f;font-size:14px;line-height:1.3}
+  .okline b{font-weight:700}
+  .or{display:flex;align-items:center;gap:10px;color:#999;font-size:13px;margin:18px 0 16px}
+  .or:before,.or:after{content:"";flex:1;height:1px;background:var(--line)}
+  .cta.ghost{background:var(--pink-bg);color:var(--red)}
+  .sheet2{position:absolute;left:0;right:0;bottom:0;top:54px;background:#fff;border-radius:24px 24px 0 0;padding:10px 0 28px;z-index:31;animation:up .2s ease-out;overflow-y:auto;scrollbar-width:none}
+  @keyframes up{from{transform:translateY(30px)}to{transform:none}}
+  .sheet2 .grab{width:40px;height:4px;border-radius:2px;background:#ddd;margin:0 auto 14px}
+  .sheet2 .x{position:absolute;right:16px;top:16px;width:30px;height:30px;border-radius:50%;background:#F1F1F1;font-size:14px;color:#666;display:grid;place-items:center}
+  .sheet2 h4{font-size:20px;font-weight:700;padding:6px 20px 0}
+  .sheet2 .fs{font-size:14px;color:var(--b);margin-top:6px;padding:0 16px}
+  .sheet2 .bi{padding:12px 16px}
+  .sheet2 .grp{font-size:13px;font-weight:700;color:var(--s);padding:16px 16px 2px}
+  .sheet2 .note{margin:14px 16px 0;padding:11px 12px;border-radius:12px;background:#FAF8F6;font-size:13px;color:#666;line-height:1.35}
+
+  .keepbox{margin:20px 20px 0;padding:6px 16px;border-radius:18px;background:#FAF8F6;border:1px solid #EEEAE5}
+  .keepbox .pt{display:flex;gap:12px;align-items:flex-start;padding:14px 0;font-size:14px;color:#444;line-height:1.45}
+  .keepbox .pt+.pt{border-top:1px solid #EEEAE5}
+  .keepbox .pt span:first-child{font-size:18px;line-height:1.2;flex:none}
+  .keepbox b{display:block;font-size:15px;color:#5A3A00}
+  .keepbox div{display:flex;gap:8px;font-size:13.5px;color:#6B4A10;margin-top:8px;line-height:1.35}
+
+  .sheet2 .bi .tx small{display:block;font-size:13px;color:var(--b);margin-top:5px;line-height:1.4}
+  .sheet2 .opt{padding:16px 20px;align-items:flex-start}
+  .sheet2 .opt .em{margin-top:2px}
+  .sheet2 .opt .q{margin-left:6px;padding-top:2px}
+  .sheet2 .opt .arr{padding-top:12px}
+  .sheet2 .bi .tx small s{color:var(--s)}
+  .sheet2 .grp2{font-size:16px;font-weight:700;color:var(--h);padding:28px 20px 8px}
+
+  .warnbox{display:flex;gap:10px;align-items:flex-start;margin:20px 20px 0;padding:16px;border-radius:18px;background:#FAF8F6;border:1px solid #EEEAE5}
+  .warnbox .wi{font-size:15px;line-height:1.45;flex:none}
+  .warnbox p{font-size:14px;color:#444;line-height:1.45}
+  .warnbox p+p{margin-top:10px}
+  .sheet2 .opt .em{width:32px;height:32px;border-radius:10px;font-size:16px}
+  .sheet2 .opt{gap:12px}
+
+  .bdslim{display:flex;align-items:center;gap:12px;width:100%;background:#fff;border-radius:22px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:14px}
+  .bdslim b{flex:1;font-size:16px;font-weight:700;color:var(--h)}
+
+  /* D: new unlock moment */
+  .eD{margin-top:14px;border-radius:22px;padding:16px;background:linear-gradient(150deg,#FFF6E2,#FFE7B5);border:1px solid #F0D49A;position:relative;overflow:hidden;width:100%;display:block}
+  .eD .new{display:inline-block;background:var(--red);color:#fff;font-size:11.5px;font-weight:800;padding:4px 8px;border-radius:8px}
+  .eD h3{font-size:20px;font-weight:800;color:#5C3800;margin-top:10px;width:70%;line-height:1.2}
+  .eD p{font-size:13px;color:#7a5a20;margin-top:6px;width:68%;line-height:1.35}
+  .eD .big{position:absolute;right:14px;top:22px;font-size:68px;transform:rotate(8deg)}
+  .eD .foot{display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(154,106,16,.2)}
+  .eD .foot .ft{font-size:13px;color:#6b4c14;flex:1;line-height:1.3}
+  .eD .foot em{font-style:normal;font-weight:700;color:var(--red);font-size:13.5px}
+  .hv{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .hv button{padding:8px 12px;border-radius:10px;background:#F3F1EE;font-weight:600;font-size:13px;color:#555;text-decoration:none;margin:0}
+  .hv button.on{background:var(--red);color:#fff}
+  .side .lbl{margin-top:20px;font-size:13px;font-weight:700;color:#333}
+  .side .desc{font-size:13px;color:#666;margin-top:8px;line-height:1.4;min-height:54px}
+
+  /* top bar for inner screens */
+  .back{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .back button{width:40px;height:40px;border-radius:12px;background:#E6E6E6;font-size:20px;font-weight:700;display:grid;place-items:center}
+  .back h3{font-size:18px;font-weight:700}
+
+  /* milestone banner */
+  .msWrap{position:relative;z-index:35}
+  .msCard{border-radius:22px;padding:16px 14px 14px;background:linear-gradient(150deg,#FFF3F3,#FFDDDD);border:1px solid #F5C4C5;position:relative;overflow:hidden}
+  .msCard .spark{position:absolute;color:#F0A63A}
+  .msCard .head{display:flex;align-items:center;gap:12px;padding-left:2px}
+  .msCard .big{font-size:36px;font-weight:800;letter-spacing:-1.2px;color:#9A2226;line-height:1}
+  .msCard .big small{font-size:15px;font-weight:600;letter-spacing:0;color:#A84B4E;margin-left:6px}
+  .msCard .nxt{font-size:13.5px;color:#8E4A4C;margin:10px 0 0 2px;line-height:1.35}
+  .track{position:relative;display:flex;margin-top:18px}
+  .track .line{position:absolute;left:calc(100%/14);right:calc(100%/14);top:9px;height:4px;border-radius:2px;background:#F2C3C4}
+  .track .fill{position:absolute;left:0;top:0;height:100%;background:var(--red);border-radius:2px}
+  .track .you{position:absolute;top:-5px;width:14px;height:14px;border-radius:50%;background:#2B2B2B;box-shadow:0 0 0 3px #fff;transform:translateX(-50%)}
+  .track .you span{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);background:#2B2B2B;color:#fff;font-size:10.5px;font-weight:700;padding:3px 6px;border-radius:6px;white-space:nowrap}
+  .node{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;padding:0 0 2px}
+  .node i{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #EFB9BA;display:grid;place-items:center;font-style:normal;font-size:11px}
+  .node.done i{background:var(--red);border-color:var(--red);color:#fff;font-weight:800}
+  .node b{font-size:12.5px;font-weight:700;color:#9A2226;margin-top:5px}
+  .node.future b{color:#C08587}
+  .node .dn{margin-top:2px;width:22px;height:18px;border-radius:6px;display:grid;place-items:center;font-size:10px;color:#A84B4E;background:rgba(255,255,255,.7)}
+  .node.open .dn{background:#9A2226;color:#fff}
+  .hint{font-size:12px;color:#A84B4E;text-align:center;margin-top:10px}
+
+  /* dropdown popover */
+  .dim{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:30}
+  .pop{position:absolute;left:0;right:0;top:calc(100% + 10px);background:#fff;border-radius:20px;padding:16px;box-shadow:0 12px 30px rgba(0,0,0,.2);animation:drop .18s ease-out}
+  @keyframes drop{from{transform:translateY(-8px)}to{transform:none}}
+  .pop .caret{position:absolute;top:-7px;width:14px;height:14px;background:#fff;transform:translateX(-50%) rotate(45deg);border-radius:3px}
+  .pop .ph{display:flex;align-items:center;gap:10px}
+  .pop .ph h4{font-size:18px;font-weight:800}
+  .pop .x{margin-left:auto;width:30px;height:30px;border-radius:50%;background:#F1F1F1;font-size:14px;color:#666;display:grid;place-items:center}
+  .pop .pi{display:flex;align-items:center;gap:12px;padding:12px 0;width:100%}
+  .pop .pi+.pi{border-top:1px solid var(--line)}
+  .pop .pi .em{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex:none}
+  .pop .pi b{font-size:15px;display:block}
+  .pop .pi small{font-size:12.5px;color:var(--s);display:block;margin-top:2px}
+  .pop .pi .arr{margin-left:auto;color:#bbb;font-weight:700}
+
+  /* benefits list */
+  .sec{font-size:16px;font-weight:800;margin:22px 2px 10px}
+  .sec small{font-weight:500;color:var(--s);font-size:13px;margin-left:6px}
+  .bl{background:#fff;border-radius:18px;overflow:hidden}
+  .bi{display:flex;align-items:center;gap:12px;padding:14px;width:100%}
+  .bi+.bi{border-top:1px solid var(--line)}
+  .bi .em{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:22px;flex:none}
+  .bi .tx{flex:1;min-width:0}
+  .bi b{font-size:15px;display:block}
+  .bi small{font-size:12.5px;color:var(--s);display:block;margin-top:3px}
+  .bi .q{text-align:right;flex:none}
+  .bi .q strong{display:block;font-size:22px;font-weight:800;color:var(--h);line-height:1}
+  .bi .q span{font-size:11.5px;color:var(--s)}
+  .bi .arr{color:#c4c4c4;font-weight:700;margin-left:2px}
+  .bi.locked .em{filter:grayscale(1);opacity:.55}
+  .bi.locked b{color:#8a8a8a}
+  .c-red{background:#FFE9E9}.c-green{background:#E3F3E8}.c-gold{background:#FFF1D4}.c-blue{background:#E6EBFA}.c-grey{background:#F0EFED}
+  .rules{background:#fff;border-radius:16px;padding:6px 14px}
+  .rules div{display:flex;gap:10px;font-size:13.5px;color:#444;padding:10px 0;line-height:1.35}
+  .rules div+div{border-top:1px solid var(--line)}
+
+  /* benefit detail */
+  .dhero{border-radius:22px;padding:20px;text-align:center;border:1px solid}
+  .dhero .em{font-size:44px}
+  .dhero h2{font-size:24px;font-weight:800;margin-top:8px;letter-spacing:-.4px}
+  .dhero .qty{display:inline-flex;align-items:baseline;gap:6px;margin-top:12px;background:#fff;border-radius:14px;padding:8px 14px}
+  .dhero .qty strong{font-size:22px;font-weight:800}
+  .dhero .qty span{font-size:13px;color:var(--b)}
+  .h-red{background:linear-gradient(150deg,#FFF0F0,#FFE0E0);border-color:#F5C4C5;color:#9A2226}
+  .h-green{background:linear-gradient(150deg,#EAF6EE,#D8EEDF);border-color:#BFDFCA;color:#185C33}
+  .h-gold{background:linear-gradient(150deg,#FFF6E2,#FFEBC4);border-color:#F0D49A;color:#7A4A00}
+  .h-blue{background:linear-gradient(150deg,#EEF1FB,#DFE5F7);border-color:#C8D2EE;color:#2D3E7A}
+  .h-grey{background:linear-gradient(150deg,#F6F5F3,#ECEAE6);border-color:#DEDBD6;color:#666}
+  .about{font-size:15px;color:#444;line-height:1.45;margin-top:16px;padding:0 2px}
+  .steps{background:#fff;border-radius:16px;padding:6px 14px}
+  .steps div{display:flex;gap:12px;align-items:center;padding:11px 0;font-size:14px;color:#333;line-height:1.3}
+  .steps div+div{border-top:1px solid var(--line)}
+  .steps .n{width:26px;height:26px;border-radius:50%;background:var(--pink-bg);color:var(--red);font-weight:800;font-size:13px;display:grid;place-items:center;flex:none}
+  .ctabar{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 16px 26px;z-index:25}
+  .ctabar .cta{margin-top:0}
+  .ctabar p{font-size:12.5px;color:var(--s);text-align:center;margin-top:8px}
+
+  /* ===== type & spacing pass: matched to the prod "EV locked" screen =====
+     title 20/600 lh1.3 · body 14/400 lh1.4 · CTA 45px tall, 16/500, radius 14 · links 16/500
+     card padding 18/16/16 · CTA gap 16 · tiles 58px · section/sheet headings use the title style */
+  .card{padding:18px 16px 16px}
+  .ttl,.ends{font-size:20px !important;font-weight:600;line-height:1.3}
+  .ends{margin-top:14px}
+  .sub{font-size:14px;line-height:1.4;margin-top:4px}
+  .cta{height:45px;padding:0 16px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:500;border-radius:14px;margin-top:16px}
+  .ctabar .cta{margin-top:0}
+  .or{margin:20px 0 22px;font-size:14px}
+  .lnk{font-size:16px;font-weight:500}
+  .chip{font-size:14px;font-weight:500}
+  .lock{font-size:14px}.lock span:first-child{font-weight:500}
+  .tile{height:58px;font-size:16px;font-weight:500}
+  .tiles{margin-top:16px}
+  .coin{font-size:16px;font-weight:500}
+  .ico{width:45px;height:45px;border-radius:14px}
+  .nav div{font-size:12px}
+  .back h3{font-size:20px;font-weight:600}
+  .bd2{padding:18px 16px 16px}
+  .bd2 .num{font-size:20px;font-weight:600;line-height:1.3}
+  .bd2 .tag{font-size:14px;line-height:1.4;margin-top:2px}
+  .tc b{font-size:14px;font-weight:500}
+  .bdslim{padding:14px 16px;margin-bottom:16px}
+  .bdslim b{font-size:16px;font-weight:600}
+  .sec{font-size:20px;font-weight:600;line-height:1.3;margin:24px 2px 12px}
+  .bi b{font-size:16px;font-weight:500}
+  .bi .q2{font-size:14px;font-weight:500}
+  .bi .q strong{font-size:20px;font-weight:600}
+  .bi .q span{font-size:12px}
+  .rules div,.steps div{font-size:14px;line-height:1.4}
+  .dhero h2{font-size:20px;font-weight:600;line-height:1.3}
+  .dhero .qty strong{font-size:20px;font-weight:600}
+  .about{font-size:14px;line-height:1.4}
+  .ctabar p{font-size:12px}
+  .nd .lb{font-size:14px;font-weight:500}
+  .sheet2 h4,.pop2 .ph h4{font-size:20px;font-weight:600;line-height:1.3}
+  .sheet2 .fs{font-size:14px;line-height:1.4}
+  .warnbox p{font-size:14px;line-height:1.4}
+  .sheet2 .grp2{font-size:20px;font-weight:600;line-height:1.3;padding:28px 20px 8px}
+  .sheet2 .bi .tx small{font-size:14px;line-height:1.4;margin-top:4px}
+
+  /* ===== phone test mode ===== */
+  html,body{height:100%}
+  body{display:block;padding:0;background:#F2F2F2;min-height:100dvh}
+  .side{display:none !important}
+  .phone{width:100%;max-width:440px;height:100dvh;margin:0 auto;border:0;border-radius:0;box-shadow:none}
+  .cam{display:none}
+  .scr{padding-top:calc(env(safe-area-inset-top) + 14px)}
+  .sheet2{top:calc(env(safe-area-inset-top) + 24px)}
+  .nav{padding-bottom:env(safe-area-inset-bottom);height:calc(78px + env(safe-area-inset-bottom))}
+  @media (min-width:600px){ body{background:#E9E7E3} .phone{box-shadow:0 0 0 1px #ddd} }
+</style>
+</head>
+<body>
+
+<div class="side">
+  <h1>Bounce Days, v2</h1>
+  <p>Home has a separate Bounce Days card. Tap its header (or See benefits) to open the benefits screen, or a small card to open that benefit.</p>
+  <p>On the benefits screen, swipe the milestone line (one every 15 days). Tap any milestone to see what it gives; tap a row or its ⓘ to open that benefit's page.</p>
+  <div class="ph">All days, quantities, fees and benefits are placeholders.</div>
+  <div class="lbl">Home state</div>
+  <div class="hv" id="hs"><button class="on" data-hs="active">Plan active</button><button data-hs="expired">Plan expired</button></div>
+  <button id="resetBtn">Reset phone</button>
+  <a href="index.html">← Back to all options</a>
+</div>
+
+<div class="phone" id="phone">
+  <div class="cam"></div>
+  <div class="scr" id="scr"></div>
+  <div id="over"></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ===== placeholder data ===== */
+const DAYS = 142;
+
+const BEN = {
+  hold: {sn:'Hold EV', e:'🔑', c:'red', name:'Hold EV', short:'Keep EV with you, locked, for 1 day. Pay <s>₹300</s> ₹150 only.', u:1, t:2, qty:'2', unit:'days left', ms:15,
+    about:'Taking a day off? Keep your EV with you instead of returning it. It stays locked for the day, and your Bounce Days keep counting.',
+    cta:'Hold my EV for ₹150', ctaNote:'₹150 instead of ₹300',
+    steps:['Tap the button and pick the day','Pay ₹150 instead of ₹300','Your EV stays with you, locked','Recharge anytime to unlock and ride'],
+    rules:['You get 1 hold day every 15 days','Save up to 3 hold days','Hold days count towards your Bounce Days']},
+  unlock: {sn:'2 hr unlock', e:'⏱️', c:'green', name:'Unlock for 2 hrs, return EV', short:'Use to return to the nearest hub within 2 hrs.', u:0, t:1, ms:60,
+    about:'Done riding, or can\'t recharge? Unlock your EV for 2 hours and return it at the nearest hub.',
+    cta:'Unlock for 2 hrs', ctaNote:'Free. Return within 2 hours.',
+    steps:['Tap unlock','Ride to the nearest hub','Return the EV within 2 hours'],
+    rules:['Only for returning the EV','EV locks again after 2 hours']},
+  ext: {sn:'Free day', e:'🎉', c:'gold', name:'Free Extension', short:'Get 1 day added for free.', u:0, t:1, ms:120,
+    about:'Get one extra day on your plan, free.',
+    cta:'Add 1 free day', ctaNote:'Your plan extends by 1 day',
+    steps:['Tap to add the day','Your EV unlocks right away','Ride as usual for 1 more day'],
+    rules:['1 free extension a month','Your Bounce Days keep counting']},
+  bnpl: {sn:'Pay later', e:'💳', c:'green', name:'Ride Now, Pay Later', short:'Use for 1 more day, pay in the next recharge.', u:0, t:1, qty:'1', unit:'use ready', ms:90,
+    about:'Short on cash today? Ride for 1 more day and pay for it in your next recharge.',
+    cta:'Ride 1 more day', ctaNote:'Added to your next recharge',
+    steps:['Tap to unlock for 1 day','Ride as usual','The day is added to your next recharge'],
+    rules:['One pay-later recharge at a time','Pay on time to use it again','A late payment pauses this benefit until cleared']},
+  jacket: {sn:'Jacket', e:'🎽', c:'gold', name:'Riding jacket', short:'Yours to keep', u:0, t:1, qty:'1', unit:'to collect', ms:90,
+    about:'A Bounce riding jacket, yours to keep. Collect it at your hub.',
+    cta:'Get collection code', ctaNote:'Show the code at your hub',
+    steps:['Tap to get your collection code','Visit your hub','Show the code and collect your jacket'],
+    rules:['One per rider','Collect within 30 days of unlocking']},
+  raincoat: {e:'🧥', c:'gold', name:'Bounce raincoat', short:'Collected on 4 Jul', u:1, t:1, qty:'✓', unit:'collected', ms:30, used:true,
+    about:'A Bounce raincoat for the monsoon. You collected yours on 4 Jul.',
+    steps:['Unlocked at Day 30','Collected at your hub'], rules:['One per rider']},
+  emi: {e:'📅', c:'grey', name:'EMI plans', short:'Cheaper monthly plan, paid weekly', ms:180, locked:true,
+    about:'A monthly plan at a lower price than four weekly plans, paid in weekly instalments.',
+    steps:['Choose the monthly plan','Pay the first instalment','Pay the rest weekly from the app'],
+    rules:['Unlocks on Day 180','Needs on-time payments in the last month']},
+  own: {e:'🏍️', c:'grey', name:'Own your EV', short:'Rent-to-own', ms:365, locked:true,
+    about:'Your weekly payments count towards owning your EV. At the end, it\'s yours.',
+    steps:['Switch to a rent-to-own plan','Keep paying weekly','Own the EV at the end of the plan'],
+    rules:['Unlocks on Day 365','Terms shared before you switch']},
+};
+
+const SPECIAL = {30:['raincoat'], 60:['unlock'], 90:['bnpl','jacket'], 120:['ext'], 180:['emi'], 365:['own']};
+const MS = [];
+for(let d=15; d<=360; d+=15) MS.push({d, items:[['hold','+1 day'], ...(SPECIAL[d]||[]).map(k=>[k,'New'])]});
+MS.push({d:365, items:SPECIAL[365].map(k=>[k,'New'])});
+const NEXT = MS.find(m=>m.d>DAYS), NI = MS.indexOf(NEXT), PREV = MS[NI-1];
+
+/* ===== state ===== */
+let st = {screen:'home', pop:null, ben:null, from:null};
+let HV = 'C';
+let HS = 'active';
+const HVS = {
+  A:['In-card strip','Lives inside the plan card. Names a few benefits and shows their icons so it reads as "stuff for me", not a stat.'],
+  B:['Rewards banner','A bold red card with fanned benefit cards. Built to be noticed and tapped; the most "exciting" of the four.'],
+  C:['Benefit shelf','Shows the actual benefits with quantities right on home. Riders see the value without tapping; tap any card to go deeper.'],
+  D:['New unlock moment','Event-driven: appears when something new unlocks or is ready to use, then falls back to A. Gives a fresh reason to tap.'],
+};
+const SCOOT = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="23" r="3.6"/><circle cx="24.5" cy="23" r="3.6"/><path d="M11.6 23h8.2l2.6-8.5"/><path d="M22.4 14.5 20.6 8h3.2"/><path d="M4.6 20.2c.9-2.8 3.2-4.4 6.6-4.4h4.6l2.4 4"/></svg>`;
+const bdIcon = (sm) => `<span class="bdi ${sm?'sm':''}">${SCOOT}</span>`;
+const READY = ['hold','ext','bnpl','jacket'];
+
+/* ===== pieces ===== */
+const nav = () => `<div class="nav">${['Rent','Earn','Wallet','Referral','Shop','More'].map((n,i)=>`<div class="${i?'':'on'}"><i></i>${n}</div>`).join('')}</div>`;
+const gauge = () => `<div class="gauge"><svg width="92" height="80" viewBox="0 0 92 80"><path d="M14 70 A38 38 0 1 1 78 70" fill="none" stroke="#F6C9CA" stroke-width="9" stroke-linecap="round"/><path d="M14 70 A38 38 0 1 1 74 22" fill="none" stroke="#D42B30" stroke-width="9" stroke-linecap="round"/></svg><strong>600</strong><small>km</small></div>`;
+const progPct = Math.round((DAYS-PREV.d)/(NEXT.d-PREV.d)*100);
+
+function homeEntry(){
+  if(HV==='A') return '';
+  if(HV==='B') return `<button class="eB" data-a="openBen">
+      <span class="tw" style="left:52%;top:14px">✦</span><span class="tw" style="right:14px;bottom:18px;font-size:12px">✦</span>
+      <span class="k">${SCOOT} ${DAYS} Bounce Days</span>
+      <h3>Your rides have unlocked rewards</h3>
+      <p>Hold your EV, free extension, pay later and more.</p>
+      <span class="go">See my benefits ›</span>
+      <div class="fan"><div class="f1"><span>💳</span>Ride now, pay later</div><div class="f2"><span>🎉</span>Free Extension</div><div class="f3"><span>🔑</span>Hold your EV</div></div>
+    </button>`;
+  if(HV==='C') return `<div class="bd2">
+      <button class="top" data-a="openBen">${bdIcon()}<span style="flex:1"><span class="num">${DAYS} Bounce Days</span><span class="tag">More rental days, more benefits</span></span><span class="all" aria-label="See all benefits">›</span></button>
+      <div class="trio">
+        ${['hold','ext','bnpl'].map(k=>{const b=BEN[k];return `<button class="tc" data-a="openDetail" data-v="${k}"><span class="em">${b.e}</span><b>${b.sn}</b></button>`}).join('')}
+        <button class="tc more" data-a="openBen"><span class="stack"><span>🎽</span><span>📅</span><span>🏍️</span></span><b>+${Object.keys(BEN).length-3} more ›</b></button>
+      </div></div>`;
+  return `<button class="eD" data-a="openDetail" data-v="jacket">
+      <span class="new">NEW</span>
+      <h3>You've unlocked a Bounce riding jacket</h3>
+      <p>Your ${DAYS} Bounce Days earned it. Collect it at your hub, it's yours to keep.</p>
+      <span class="big">🎽</span>
+      <div class="foot">${bdIcon(true)}<span class="ft">Also ready: hold days, free extension and pay later</span><em>Collect ›</em></div>
+    </button>`;
+}
+
+function homeExpired(){
+  return `<div class="hdr"><div class="coin"><b>₹</b>Earn coins ›</div><div class="sp"></div><div class="ico">⚡</div><div class="ico">☎</div></div>
+  <div class="banner"><b>₹100. <span>Bas.</span></b><p>Investing bhi yahin se shuru ho sakti hai.</p><em>START INVESTING →</em><div class="scooter">🛵</div></div><div class="dots"><i></i><i class="on"></i></div>
+  <button class="bdslim" data-a="openBen">${bdIcon(true)}<b>${DAYS} Bounce Days</b><span class="lnk">See benefits ›</span></button>
+  <div class="card">
+    <div class="row" style="align-items:flex-start"><div style="flex:1"><div class="ttl">Your plan has ended</div><div class="sub">Your EV is locked and safe. Recharge anytime to ride again.</div></div><div class="lockic">🔒</div></div>
+    <button class="cta" data-a="toast" data-v="Opens recharge">Recharge to unlock</button>
+    <div class="or">or</div>
+    <div class="row" style="align-items:flex-start"><div style="flex:1"><div class="ttl" style="font-size:20px">Not recharging?</div><div class="sub">Your ${DAYS} Bounce Days have unlocked a few benefits</div></div><div style="font-size:38px;line-height:1">🎁</div></div>
+    <button class="cta ghost" data-a="sheet">Use benefits, save deposit</button>
+  </div>
+  <div class="tiles"><div class="tile earn"><span>💰</span>Earn More</div><div class="tile ref"><span>🤝</span>Refer Friend</div></div>`;
+}
+function optionsSheet(){
+  if(st.sheet!=='opts') return '';
+  const used = k => { const b=BEN[k]; return `<button class="bi" data-a="openDetail" data-v="${k}"><span class="em c-${b.c}">${b.e}</span><span class="tx"><b>${b.name}</b></span><span class="q2">${b.u}/${b.t} used</span><span class="arr">›</span></button>`; };
+  const plain = (e,t,a,v) => `<button class="bi" data-a="${a}" data-v="${v}"><span class="em c-red">${e}</span><span class="tx"><b>${t}</b></span><span class="arr">›</span></button>`;
+  return `<div class="dim" data-a="closeSheet"></div><div class="sheet2"><div class="grab"></div><button class="x" data-a="closeSheet">✕</button>
+    <h4>Your earned benefits</h4>
+    <div class="fs" style="padding:0 20px;margin-top:8px;line-height:1.4">Use the benefits below to keep renting or to return your EV.</div>
+    <div class="warnbox"><span class="wi">⚠️</span><div>
+      <p>If not, our team collects your EV. Your deposit and one time fee then reset to ₹0, so your next booking costs ₹2000 more.</p>
+      <p>Your ${DAYS} Bounce Days will also reset to 0, along with removing all your available benefits.</p>
+    </div></div>
+    <div class="grp2">${DAYS} Bounce Days earned benefits</div>
+    ${[['unlock','use'],['bnpl','day'],['hold','day'],['ext','day']].map(([k,unit])=>{const b=BEN[k], n=b.t-b.u;return `<button class="bi opt" data-a="openDetail" data-v="${k}"><span class="em c-${b.c}">${b.e}</span><span class="tx"><b>${b.name}</b><small>${b.short}</small></span><span class="q"><strong>${n}</strong><span>${unit}${n===1?'':'s'} left</span></span><span class="arr">›</span></button>`}).join('')}
+  </div>`;
+}
+
+function home(){
+  return `<div class="hdr"><div class="coin"><b>₹</b>180 ›</div><div class="sp"></div><div class="ico">⚡</div><div class="ico">☎</div></div>
+  <div class="banner"><b>₹100. <span>Bas.</span></b><p>Investing bhi yahin se shuru ho sakti hai.</p><em>START INVESTING →</em><div class="scooter">🛵</div></div><div class="dots"><i></i><i class="on"></i></div>
+  <div class="card">
+    <div class="row"><span class="chip active">Active now</span><div class="sp"></div><span class="lnk">Recharge ›</span></div>
+    <div class="ends" style="font-size:20px">Ends on 20 Oct, 10:30 PM</div><div class="sub">7 days, Unlimited km</div>
+    <div class="lock"><span>⚡ Price lock active till 12 Nov</span><span>12 days left</span></div>
+    <div class="bar"><i style="width:82%"></i></div>
+    ${HV==='A' ? `<button class="eA" data-a="openBen">${bdIcon()}<span style="flex:1"><b>${DAYS} Bounce Days</b><small>Hold, free extension, pay later and more unlocked for you</small></span><span class="stack"><span class="c-red">🔑</span><span class="c-gold">🎉</span><span class="c-green">💳</span></span><span style="color:#c4c4c4;font-weight:700">›</span></button>` : ''}
+  </div>
+  ${homeEntry()}
+  <div class="tiles"><div class="tile earn"><span>💰</span>Earn More</div><div class="tile ref"><span>🤝</span>Refer Friend</div></div>`;
+}
+
+const NODE_W = 78;
+function youX(){ // x of "You" inside the track, in px
+  return (NI-1)*NODE_W + NODE_W/2 + NODE_W*(DAYS-PREV.d)/(NEXT.d-PREV.d);
+}
+function track(){
+  const n = MS.length, first = NODE_W/2, w = n*NODE_W;
+  return `<div class="trkS" id="trk"><div class="in" style="width:${w}px">
+    <div class="line" style="left:${first}px;width:${w-NODE_W}px"><div class="fill" style="width:${youX()-first}px"></div><div class="you" style="left:${youX()-first}px"><span>You</span></div></div>
+    ${MS.map((m,i)=>`<button class="nd ${m.d<=DAYS?'done':''} ${st.pop===i?'open':''}" data-a="pop" data-v="${i}"><i>${m.d<=DAYS?'✓':''}</i><span class="lb">${m.d}<em><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3.5 5 6.5 8 3.5"/></svg></em></span></button>`).join('')}
+  </div></div>`;
+}
+function popup(){
+  if(st.pop===null) return '';
+  const m = MS[st.pop], done = m.d<=DAYS;
+  return `<div class="dim" data-a="closePop"></div><div class="pop2" id="pop2"><span class="caret" id="caret"></span>
+    <div class="ph"><h4>Day ${m.d}</h4><span class="chip ${done?'green':'grey'}">${done?'Unlocked':'Locked'}</span><button class="x" data-a="closePop">✕</button></div>
+    <div>${m.items.map(([k,tag])=>{const b=BEN[k];return `<button class="bi ${done?'':'locked'}" data-a="openDetail" data-v="${k}"><span class="em c-${b.c}">${b.e}</span><span class="tx"><b>${b.name}</b></span><span class="q2">${tag}</span><span class="ib" aria-label="Details">i</span></button>`}).join('')}</div>
+  </div>`;
+}
+function placePopup(){
+  const pop = document.getElementById('pop2'); if(!pop) return;
+  const phone = document.getElementById('phone'), node = document.querySelectorAll('#trk .nd')[st.pop], ph = phone.getBoundingClientRect();
+  const cs = getComputedStyle(phone), bl = parseFloat(cs.borderLeftWidth)||0, bt = parseFloat(cs.borderTopWidth)||0;
+  const r = node.getBoundingClientRect();
+  pop.style.top = (r.bottom - ph.top - bt + 4) + 'px';
+  const cx = r.left + r.width/2 - ph.left - bl - 16; // minus phone border and popup inset
+  document.getElementById('caret').style.left = Math.max(18, Math.min(cx, pop.offsetWidth-18)) + 'px';
+}
+
+function benefits(){
+  const all = Object.entries(BEN).sort((a,b)=>(a[1].locked?1:0)-(b[1].locked?1:0));
+  const row = ([k,b]) => `<button class="bi ${b.locked?'locked':''}" data-a="openDetail" data-v="${k}">
+      <span class="em c-${b.c}">${b.e}</span><span class="tx"><b>${b.name}</b></span>
+      <span class="q2">${b.locked ? 'Locked' : `${b.u}/${b.t} used`}</span><span class="arr">›</span></button>`;
+  return `<div class="back"><button data-a="home">‹</button><h3>Bounce Days</h3></div>
+    <div class="bd2" style="margin-top:0">
+      <div class="top">${bdIcon()}<span style="flex:1"><span class="num">${DAYS} Bounce Days</span><span class="tag">Every day you ride adds one</span></span></div>
+      ${track()}
+      <button class="howlink" data-a="how">How it works</button>
+    </div>
+    <div class="sec">Your benefits</div><div class="bl">${all.map(row).join('')}</div>
+    <div class="sec" id="how">How Bounce Days work</div>
+    <div class="rules" id="howBox">
+      <div><span>🗓️</span>Every rental day adds one to your Bounce Days.</div>
+      <div><span>✅</span>Your days never go down. Breaks don't cost you anything.</div>
+      <div><span>🔒</span>If our team collects your EV for non-payment, your Bounce Days and benefits reset to 0.</div>
+    </div>`;
+}
+
+function detail(){
+  const b = BEN[st.ben];
+  const qty = b.locked ? `<div class="qty"><strong>Day ${b.ms}</strong><span>unlocks at</span></div>`
+            : `<div class="qty"><strong>${b.u}/${b.t}</strong><span>used</span></div>`;
+  return `<div class="back"><button data-a="backFromDetail">‹</button><h3>${b.name}</h3></div>
+    <div class="dhero h-${b.c}"><div class="em">${b.e}</div><h2>${b.name}</h2>${qty}</div>
+    <p class="about">${b.about}</p>
+    <div class="sec">How it works</div>
+    <div class="steps">${b.steps.map((s,i)=>`<div><span class="n">${i+1}</span>${s}</div>`).join('')}</div>
+    <div class="sec">Good to know</div>
+    <div class="rules">${b.rules.map(r=>`<div><span>•</span>${r}</div>`).join('')}</div>`;
+}
+function ctabar(){
+  const b = BEN[st.ben];
+  if(b.locked) return `<div class="ctabar"><button class="cta" disabled>Unlocks on Day ${b.ms}</button><p>Keep riding to unlock</p></div>`;
+  if(b.u>=b.t) return `<div class="ctabar"><button class="cta" disabled>All used</button></div>`;
+  return `<div class="ctabar"><button class="cta" data-a="toast" data-v="Opens: ${b.cta}">${b.cta}</button><p>${b.ctaNote}</p></div>`;
+}
+
+/* ===== render ===== */
+function render(keepScroll){
+  const scr = document.getElementById('scr'), y = scr.scrollTop;
+  let html='', over='';
+  if(st.screen==='home'){ html = HS==='expired' ? homeExpired() : home(); over = nav() + (HS==='expired' ? optionsSheet() : ''); }
+  if(st.screen==='ben'){ html = benefits(); over = nav() + popup(); }
+  if(st.screen==='detail'){ html = detail(); over = ctabar(); }
+  scr.innerHTML = html;
+  document.getElementById('over').innerHTML = over;
+  scr.className = 'scr' + (st.screen==='detail'?' detail':'');
+  scr.scrollTop = keepScroll ? y : 0;
+  wireTrio();
+  const trk = document.getElementById('trk');
+  if(trk){
+    trk.scrollLeft = (st.trkX!=null) ? st.trkX : youX() - trk.clientWidth/2 + 16;
+    trk.addEventListener('scroll', ()=>{ st.trkX = trk.scrollLeft; });
+  }
+  placePopup();
+}
+function wireTrio(){
+  const t = document.querySelector('.trio'); if(!t) return;
+  t.addEventListener('scroll', ()=>{
+    clearTimeout(t._h);
+    t._h = setTimeout(()=>{ if(t.scrollLeft + t.clientWidth >= t.scrollWidth - 4 && st.screen==='home'){ st={screen:'ben',pop:null}; render(); } }, 250);
+  });
+}
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),1800); }
+
+document.getElementById('phone').addEventListener('click', e=>{
+  const a = e.target.closest('[data-a]'); if(!a) return;
+  const v = a.dataset.v;
+  switch(a.dataset.a){
+    case 'openBen': st = {screen:'ben', pop:null, trkX:null}; render(); break;
+    case 'home': st = {screen:'home', pop:null}; render(); break;
+    case 'pop': st.pop = (st.pop===+v) ? null : +v; render(true); break;
+    case 'closePop': st.pop = null; render(true); break;
+    case 'openDetail': st.sheet = null; st.from = st.screen; st.ben = v; st.pop = null; st.screen = 'detail'; st.benY = document.getElementById('scr').scrollTop; render(); break;
+    case 'backFromDetail': st.screen = st.from==='home' ? 'home' : 'ben'; render(); break;
+    case 'toast': toast(v); break;
+    case 'sheet': st.sheet='opts'; render(true); break;
+    case 'closeSheet': st.sheet=null; render(true); break;
+    case 'how': { const h=document.getElementById('how'), box=document.getElementById('howBox'); h.scrollIntoView({behavior:'smooth',block:'start'}); box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash'); break; }
+  }
+});
+function renderHv(){
+  document.getElementById('hv').innerHTML = Object.entries(HVS).map(([k,v])=>`<button class="${k===HV?'on':''}" data-hv="${k}">${k}: ${v[0]}</button>`).join('');
+  document.getElementById('hvDesc').textContent = HVS[HV][1];
+}
+document.getElementById('hs').addEventListener('click', e=>{ const b=e.target.closest('[data-hs]'); if(!b) return; HS=b.dataset.hs; document.querySelectorAll('#hs button').forEach(x=>x.classList.toggle('on',x===b)); st={screen:'home',pop:null}; render(); });
+document.getElementById('resetBtn').onclick = ()=>{ st={screen:'home',pop:null}; render(); };
+
+// dev preview via hash: #ben, #ben:4 (popover open on milestone index), #detail:hold
+(function(){
+  const [s,arg] = location.hash.slice(1).split(':');
+  if(s==='ben'){ st.screen='ben'; if(arg!==undefined) st.pop=+arg; }
+  if(s==='detail'){ st.screen='detail'; st.ben=arg||'hold'; }
+  if(s==='home' && arg) HV=arg;
+  if(s==='expired' && arg==='opts') st.sheet='opts';
+  if(s==='expired' && arg==='down') setTimeout(()=>{document.getElementById('scr').scrollTop=9999},50);
+  if(s==='expired'){ HS='expired'; setTimeout(()=>document.querySelectorAll('#hs button').forEach(x=>x.classList.toggle('on',x.dataset.hs==='expired'))); }
+})();
+if(new URLSearchParams(location.search).get('state')==='expired') HS='expired';
+render();
+</script>
+</body>
+</html>
