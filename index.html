@@ -426,6 +426,13 @@
   .bd2 .tc.more{background:#fff;border-color:#EBCFD0}
   .bd2 .all{background:#fff}
   .bd2.plain{background:#fff;border:0;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  /* expired sheet: grey sheet, white cards (same as the Bounce Days screen) */
+  .sheet2{background:var(--app)}
+  .sheet2 .x{background:#fff}
+  .sheet2 .warnbox{background:#fff;border-color:#EEEAE5}
+  .sheetlist{margin:0 16px;border-radius:18px}
+  .sheetlist .bi.opt{padding:16px}
+  .sheet2 .grp2{padding:28px 20px 12px}
 
   /* ===== phone test mode ===== */
   html,body{height:100%}
@@ -466,12 +473,12 @@ const IMG = {"promo": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA
 const DAYS = 142;
 
 const BEN = {
-  hold: {sn:'Hold EV', e:'🔑', c:'red', name:'Hold EV', short:'Keep EV with you, locked, for 1 day. Pay <s>₹300</s> ₹150 only.', u:1, t:2, qty:'2', unit:'days left', ms:15,
+  hold: {sn:'Hold EV', e:'🔑', c:'red', name:'Hold EV', short:'Keep EV for a day, locked, for <s>₹300</s> ₹150.', u:1, t:2, qty:'2', unit:'days left', ms:15,
     about:'Taking a day off? Keep your EV with you instead of returning it. It stays locked for the day, and your Bounce Days keep counting.',
     cta:'Hold my EV for ₹150', ctaNote:'₹150 instead of ₹300',
     steps:['Tap the button and pick the day','Pay ₹150 instead of ₹300','Your EV stays with you, locked','Recharge anytime to unlock and ride'],
     rules:['You get 1 hold day every 15 days','Save up to 3 hold days','Hold days count towards your Bounce Days']},
-  unlock: {sn:'2 hr unlock', e:'⏱️', c:'green', name:'2 hrs EV unlock', sheetName:'Unlock for 2 hrs, return EV', short:'Use to return to the nearest hub within 2 hrs.', u:0, t:1, ms:60,
+  unlock: {sn:'2 hr unlock', e:'⏱️', c:'green', name:'2 hrs EV unlock', sheetName:'Unlock for 2 hrs, return EV', short:'Unlock and return EV in any Bounce hub in 2 hrs.', u:0, t:1, ms:60,
     about:'Done riding, or can\'t recharge? Unlock your EV for 2 hours and return it at the nearest hub.',
     cta:'Unlock for 2 hrs', ctaNote:'Free. Return within 2 hours.',
     steps:['Tap unlock','Ride to the nearest hub','Return the EV within 2 hours'],
@@ -481,7 +488,7 @@ const BEN = {
     cta:'Add 1 free day', ctaNote:'Your plan extends by 1 day',
     steps:['Tap to add the day','Your EV unlocks right away','Ride as usual for 1 more day'],
     rules:['1 free extension a month','Your Bounce Days keep counting']},
-  bnpl: {sn:'Pay later', e:'💳', c:'green', name:'Ride Now, Pay Later', short:'Use for 1 more day, pay in the next recharge.', u:0, t:1, qty:'1', unit:'use ready', ms:90,
+  bnpl: {sn:'Pay later', e:'💳', c:'green', name:'Ride Now, Pay Later', short:'Get 1-day now, pay in next recharge.', u:0, t:1, qty:'1', unit:'use ready', ms:90,
     about:'Short on cash today? Ride for 1 more day and pay for it in your next recharge.',
     cta:'Ride 1 more day', ctaNote:'Added to your next recharge',
     steps:['Tap to unlock for 1 day','Ride as usual','The day is added to your next recharge'],
@@ -593,7 +600,7 @@ function optionsSheet(){
       <p>Your ${DAYS} Bounce Days will also reset to 0, along with removing all your available benefits.</p>
     </div></div>
     <div class="grp2">${DAYS} Bounce Days earned benefits</div>
-    ${[['unlock','use'],['bnpl','day'],['hold','day'],['ext','day']].map(([k,unit])=>{const b=BEN[k], n=b.t-b.u;return `<button class="bi opt" data-a="openDetail" data-v="${k}"><span class="em c-${b.c}">${b.e}</span><span class="tx"><b>${b.sheetName||b.name}</b><small>${b.short}</small></span><span class="q"><strong>${n}</strong><span>${unit}${n===1?'':'s'} left</span></span><span class="arr">›</span></button>`}).join('')}
+    <div class="bl sheetlist">${[['unlock','use'],['bnpl','day'],['hold','day'],['ext','day']].map(([k,unit])=>{const b=BEN[k], n=b.t-b.u;return `<button class="bi opt" data-a="openDetail" data-v="${k}"><span class="em c-${b.c}">${b.e}</span><span class="tx"><b>${b.sheetName||b.name}</b><small>${b.short}</small></span><span class="q"><strong>${n}</strong><span>${unit}${n===1?'':'s'} left</span></span><span class="arr">›</span></button>`}).join('')}</div>
   </div>`;
 }
 
