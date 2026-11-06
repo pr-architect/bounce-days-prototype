@@ -433,6 +433,36 @@
   .sheetlist{margin:0 16px;border-radius:18px}
   .sheetlist .bi.opt{padding:16px}
   .sheet2 .grp2{padding:28px 20px 12px}
+  /* end-booking flow */
+  .retlink{display:block;width:100%;margin-top:14px;padding-top:12px;border-top:1px dashed #ECE6E6;font-size:14px;font-weight:500;color:var(--red);text-align:left}
+  .eh{font-size:20px;font-weight:600;line-height:1.3;margin-top:4px}
+  .es{font-size:14px;color:var(--b);line-height:1.4;margin-top:6px}
+  .keepcard{margin-top:18px;background:#FFF5F5;border:1px solid #F7DEDF;border-radius:22px;padding:20px 16px;text-align:center}
+  .keepcard .bdi{margin:0 auto}
+  .keepcard .big{font-size:20px;font-weight:600;margin-top:12px;line-height:1.3}
+  .keepcard p{font-size:14px;color:var(--b);margin-top:6px;line-height:1.4}
+  .paycard{margin-top:18px;background:#fff;border-radius:22px;padding:18px 16px}
+  .paycard .rowp{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:15px}
+  .paycard .rowp b{font-size:16px;font-weight:600}
+  .paycard .tot{border-top:1px solid var(--line);margin-top:6px;padding-top:12px}
+  .paycard .tot b{font-size:20px;color:var(--green)}
+  .tiers{display:flex;gap:6px;margin-top:12px}
+  .tiers div{flex:1;border:1px solid #EEEAE5;border-radius:12px;padding:8px 4px;text-align:center;font-size:12px;color:var(--s);line-height:1.3}
+  .tiers div b{display:block;font-size:15px;color:var(--h);font-weight:600}
+  .tiers div.on{border-color:var(--green);background:var(--green-bg);color:#185C33}
+  .tiers div.on b{color:#185C33}
+  .dgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+  .dgrid button{border:1.5px solid #EEEAE5;background:#fff;border-radius:12px;padding:7px 0;text-align:center;font-size:11.5px;color:var(--s)}
+  .dgrid button b{display:block;font-size:16px;color:var(--h);font-weight:600}
+  .dgrid button.on{border-color:var(--red);background:#FFF5F5}.dgrid button.on b{color:var(--red)}
+  .note{font-size:13px;color:var(--b);line-height:1.4;margin-top:12px}
+  .codebox{margin-top:16px;background:#fff;border-radius:22px;padding:18px 16px;text-align:center}
+  .codebox small{font-size:13px;color:var(--b)}
+  .codebox b{display:block;font-size:34px;letter-spacing:6px;font-weight:700;margin-top:6px}
+  .hubcard{margin-top:12px;background:#fff;border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+  .hubcard b{font-size:16px;font-weight:600;display:block}.hubcard small{font-size:13px;color:var(--b)}
+  .okband{margin-top:16px;background:var(--green-bg);color:#14562f;border-radius:16px;padding:12px 14px;font-size:14px;line-height:1.4}
+  .ctabar .lnk2{display:block;width:100%;text-align:center;margin-top:12px;font-size:14px;font-weight:500;color:var(--b)}
 
   /* ===== phone test mode ===== */
   html,body{height:100%}
@@ -514,17 +544,18 @@ const BEN = {
   raincoat: {e:'🧥', c:'gold', name:'Bounce raincoat', short:'Collected on 4 Jul', u:1, t:1, qty:'✓', unit:'collected', ms:30, used:true,
     about:'A Bounce raincoat for the monsoon. You collected yours on 4 Jul.',
     steps:['Unlocked at Day 30','Collected at your hub'], rules:['One per rider']},
-  emi: {e:'📅', c:'grey', name:'EMI plans', short:'Cheaper monthly plan, paid weekly', ms:180, locked:true,
-    about:'A monthly plan at a lower price than four weekly plans, paid in weekly instalments.',
-    steps:['Choose the monthly plan','Pay the first instalment','Pay the rest weekly from the app'],
-    rules:['Unlocks on Day 180','Needs on-time payments in the last month']},
+  emi: {e:'📅', c:'blue', name:'EMI on 7-day plan', short:'Pay ₹1,999 in 4 daily parts of ₹500', u:0, t:1, ms:55,
+    about:'Take a 7-day plan now and pay for it in 4 parts, one each day, instead of all at once.',
+    cta:'Get 7-day plan on EMI', ctaNote:'₹500 today, then ₹500 a day for 3 days',
+    steps:['Pick the 7-day plan and choose EMI','Pay ₹500 today and ride','Pay ₹500 on each of the next 3 days','A missed part locks the EV until paid'],
+    rules:['Only on 7-day plans','No extra charge']},
   own: {e:'🏍️', c:'grey', name:'Own your EV', short:'Rent-to-own', ms:365, locked:true,
     about:'Your weekly payments count towards owning your EV. At the end, it\'s yours.',
     steps:['Switch to a rent-to-own plan','Keep paying weekly','Own the EV at the end of the plan'],
     rules:['Unlocks on Day 365','Terms shared before you switch']},
 };
 
-const SPECIAL = {15:['holder'], 30:['raincoat'], 60:['unlock'], 90:['bnpl','jacket'], 105:['helmet'], 120:['ext'], 150:['gold'], 180:['emi'], 365:['own']};
+const SPECIAL = {15:['holder'], 30:['raincoat'], 60:['unlock'], 90:['bnpl','jacket'], 105:['helmet'], 120:['ext'], 150:['gold'], 60:['emi'], 365:['own']};
 const MS = [];
 for(let d=15; d<=360; d+=15) MS.push({d, items:[['hold','+1 day'], ...(SPECIAL[d]||[]).map(k=>[k,'New'])]});
 MS.push({d:365, items:SPECIAL[365].map(k=>[k,'New'])});
@@ -601,6 +632,7 @@ function optionsSheet(){
     </div></div>
     <div class="grp2">${DAYS} Bounce Days earned benefits</div>
     <div class="bl sheetlist">${[['unlock','use'],['bnpl','day'],['hold','day'],['ext','day']].map(([k,unit])=>{const b=BEN[k], n=b.t-b.u;return `<button class="bi opt" data-a="openDetail" data-v="${k}"><span class="em c-${b.c}">${b.e}</span><span class="tx"><b>${b.sheetName||b.name}</b><small>${b.short}</small></span><span class="q"><strong>${n}</strong><span>${unit}${n===1?'':'s'} left</span></span><span class="arr">›</span></button>`}).join('')}</div>
+    <button class="retlink" style="text-align:center;margin:18px 0 4px" data-a="startEnd">Want to return your EV instead? ›</button>
   </div>`;
 }
 
@@ -612,6 +644,7 @@ function home(){
     <div class="ends" style="font-size:20px">Ends on 20 Oct, 10:30 PM</div><div class="sub">7 days, Unlimited km</div>
     <div class="lock"><span>⚡ Price lock active till 12 Nov</span><span>12 days left</span></div>
     <div class="bar"><i style="width:82%"></i></div>
+    <button class="retlink" data-a="startEnd">Done riding? Return your EV ›</button>
     ${HV==='A' ? `<button class="eA" data-a="openBen">${bdIcon()}<span style="flex:1"><b>${DAYS} Bounce Days</b><small>Hold, free extension, pay later and more unlocked for you</small></span><span class="stack"><span class="c-red">🔑</span><span class="c-gold">🎉</span><span class="c-green">💳</span></span><span style="color:#c4c4c4;font-weight:700">›</span></button>` : ''}
   </div>
   ${homeEntry()}
@@ -686,6 +719,66 @@ function ctabar(){
   return `<div class="ctabar"><button class="cta" data-a="toast" data-v="Opens: ${b.cta}">${b.cta}</button><p>${b.ctaNote}</p></div>`;
 }
 
+/* ===== end-booking flow ===== */
+const credit = () => DAYS <= 55 ? 200 : DAYS <= 180 ? 400 : 600;
+const PREBOOK = 1000;
+const REASONS = [
+  ['cash','👛','Short on cash right now'],
+  ['break','🌴','Taking a short break'],
+  ['ev','🔧','Problem with my EV'],
+  ['away','🧳','Going home for a while'],
+  ['done','👋','Done riding for now'],
+];
+const BEFORE = {
+  cash:  {t:"Short on cash? You don't have to return the EV", rows:[['ben','bnpl'],['ben','emi']]},
+  break: {t:'Taking a break? Keep your EV instead', rows:[['ben','hold'],['ben','ext']]},
+  ev:    {t:"Let's fix the EV instead", rows:[['act','🔁','Swap your EV at the hub','Get a different EV today','EV swap booked at your hub'],['act','🎧','Talk to us','Chat or call support','Opens support chat']]},
+  away:  {t:'Before you go', rows:[['ben','hold'],['ben','ext']]},
+  done:  {t:'Before you go', rows:[['ben','ext'],['ben','bnpl']]},
+};
+function dates(){ const out=[]; for(let i=1;i<=15;i++){ const d=new Date(2026,9,16+i); out.push({k:i, m:d.toLocaleString('en',{month:'short'}), n:d.getDate()}); } return out; }
+function endScreen(){
+  const E = st.end, head = `<div class="back"><button data-a="endBack">‹</button><h3>Return EV</h3></div>`;
+  if(E.step==='reason') return head + `<div class="eh">Why are you returning your EV?</div><div class="es">One tap. It helps us help you.</div>
+    <div class="bl" style="margin-top:18px">${REASONS.map(([k,e,t])=>`<button class="bi" data-a="endReason" data-v="${k}"><span class="em c-red">${e}</span><span class="tx"><b>${t}</b></span><span class="arr">›</span></button>`).join('')}</div>`;
+  if(E.step==='before'){ const B = BEFORE[E.reason];
+    return head + `<div class="eh">${B.t}</div><div class="es">Your ${DAYS} Bounce Days have earned you these.</div>
+    <div class="bl" style="margin-top:18px">${B.rows.map(r=> r[0]==='ben'
+      ? (b=>`<button class="bi opt" data-a="openDetail" data-v="${r[1]}"><span class="em c-${b.c}">${b.e}</span><span class="tx"><b>${b.name}</b><small>${b.short}</small></span><span class="arr">›</span></button>`)(BEN[r[1]])
+      : `<button class="bi opt" data-a="toast" data-v="${r[4]}"><span class="em c-red">${r[1]}</span><span class="tx"><b>${r[2]}</b><small>${r[3]}</small></span><span class="arr">›</span></button>`).join('')}</div>`; }
+  if(E.step==='keep') return head + `<div class="keepcard">${bdIcon()}<div class="big">Your ${DAYS} Bounce Days stay with you</div><p>Come back whenever you can. You continue from Day ${DAYS}.</p></div>
+    <div class="rules" style="margin-top:14px">
+      <div><span>✅</span>All your earned benefits stay safe</div>
+      <div><span>🗓️</span>Come back anytime, continue from Day ${DAYS}</div>
+      <div><span>📄</span>No documents needed again</div></div>`;
+  if(E.step==='prebook'){ const c=credit();
+    return head + `<div class="eh">Pre-book your comeback</div><div class="es">Pay ₹${PREBOOK.toLocaleString('en-IN')} now. Bounce adds ₹${c} for your ${DAYS} Bounce Days.</div>
+    <div class="paycard">
+      <div class="rowp"><span>You pay</span><b>₹${PREBOOK.toLocaleString('en-IN')}</b></div>
+      <div class="rowp"><span>Bounce adds</span><b style="color:var(--green)">+ ₹${c}</b></div>
+      <div class="rowp tot"><span>Ready for your first plan back</span><b>₹${(PREBOOK+c).toLocaleString('en-IN')}</b></div>
+      <div class="tiers"><div class="${DAYS<=55?'on':''}"><b>₹200</b>Up to Day 55</div><div class="${DAYS>55&&DAYS<=180?'on':''}"><b>₹400</b>Day 56 to 180</div><div class="${DAYS>180?'on':''}"><b>₹600</b>Day 181+</div></div>
+    </div>
+    <div class="sec">When are you coming back?</div>
+    <div class="dgrid">${dates().map(d=>`<button class="${E.date===d.k?'on':''}" data-a="endDate" data-v="${d.k}">${d.m}<b>${d.n}</b></button>`).join('')}</div>
+    <p class="note">Cancel anytime and get your full ₹${PREBOOK.toLocaleString('en-IN')} back. We'll keep an EV ready and remind you a day before.</p>`; }
+  // summary
+  const d = E.date ? dates().find(x=>x.k===E.date) : null;
+  return head + `<div class="eh">Return your EV</div><div class="es">Ride to the hub and show this code to the hub team.</div>
+    ${E.pre ? `<div class="okband">✅ Comeback pre-booked for ${d.n} ${d.m}. ₹${(PREBOOK+credit()).toLocaleString('en-IN')} ready for your first plan back.</div>` : ''}
+    <div class="codebox"><small>Return code</small><b>4821</b></div>
+    <div class="hubcard"><span class="em c-red" style="width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:20px">📍</span><span style="flex:1"><b>HSR Layout Hub</b><small>2.1 km away · open till 9 PM</small></span><span class="lnk">Map ›</span></div>
+    <div class="steps" style="margin-top:16px"><div><span class="n">1</span>Ride to the hub</div><div><span class="n">2</span>Show the return code</div><div><span class="n">3</span>Hub team checks the EV, and you're done</div></div>`;
+}
+function endBar(){
+  const E = st.end;
+  if(E.step==='reason') return '';
+  if(E.step==='before') return `<div class="ctabar"><button class="cta ghost" data-a="endNext" data-v="keep">No thanks, continue to return</button></div>`;
+  if(E.step==='keep') return `<div class="ctabar"><button class="cta" data-a="endNext" data-v="prebook">Continue</button></div>`;
+  if(E.step==='prebook') return `<div class="ctabar"><button class="cta" data-a="endPre" ${E.date?'':'disabled'}>${E.date?`Pay ₹${PREBOOK.toLocaleString('en-IN')} and pre-book`:'Pick a return date'}</button><button class="lnk2" data-a="endSkip">Skip, just return the EV</button></div>`;
+  return `<div class="ctabar"><button class="cta" data-a="toast" data-v="Opens map to HSR Layout Hub">Navigate to hub</button><button class="lnk2" data-a="home">Done</button></div>`;
+}
+
 /* ===== render ===== */
 function render(keepScroll){
   const scr = document.getElementById('scr'), y = scr.scrollTop;
@@ -693,9 +786,10 @@ function render(keepScroll){
   if(st.screen==='home'){ html = HS==='expired' ? homeExpired() : home(); over = nav() + (HS==='expired' ? optionsSheet() : ''); }
   if(st.screen==='ben'){ html = benefits(); over = nav() + popup(); }
   if(st.screen==='detail'){ html = detail(); over = ctabar(); }
+  if(st.screen==='end'){ html = endScreen(); over = endBar(); }
   scr.innerHTML = html;
   document.getElementById('over').innerHTML = over;
-  scr.className = 'scr' + (st.screen==='detail'?' detail':'');
+  scr.className = 'scr' + ((st.screen==='detail'||st.screen==='end')?' detail':'');
   scr.scrollTop = keepScroll ? y : 0;
   wireTrio();
   const trk = document.getElementById('trk');
@@ -723,7 +817,14 @@ document.getElementById('phone').addEventListener('click', e=>{
     case 'pop': st.pop = (st.pop===+v) ? null : +v; render(true); break;
     case 'closePop': st.pop = null; render(true); break;
     case 'openDetail': st.sheet = null; st.from = st.screen; st.ben = v; st.pop = null; st.screen = 'detail'; st.benY = document.getElementById('scr').scrollTop; render(); break;
-    case 'backFromDetail': st.screen = st.from==='home' ? 'home' : 'ben'; render(); break;
+    case 'backFromDetail': st.screen = st.from==='home' ? 'home' : st.from==='end' ? 'end' : 'ben'; render(); break;
+    case 'startEnd': st = {screen:'end', pop:null, end:{step:'reason'}}; render(); break;
+    case 'endReason': st.end.reason = v; st.end.hist=['reason']; st.end.step='before'; render(); break;
+    case 'endNext': st.end.hist.push(st.end.step); st.end.step = v; render(); break;
+    case 'endDate': st.end.date = +v; render(true); break;
+    case 'endPre': st.end.pre = true; st.end.hist.push(st.end.step); st.end.step='summary'; render(); break;
+    case 'endSkip': st.end.pre = false; st.end.hist.push(st.end.step); st.end.step='summary'; render(); break;
+    case 'endBack': if(st.end.hist && st.end.hist.length){ st.end.step = st.end.hist.pop(); render(); } else { st = {screen:'home', pop:null}; render(); } break;
     case 'toast': toast(v); break;
     case 'sheet': st.sheet='opts'; render(true); break;
     case 'closeSheet': st.sheet=null; render(true); break;
@@ -742,6 +843,7 @@ document.getElementById('resetBtn').onclick = ()=>{ st={screen:'home',pop:null};
   const [s,arg] = location.hash.slice(1).split(':');
   if(s==='ben'){ st.screen='ben'; if(arg!==undefined) st.pop=+arg; }
   if(s==='detail'){ st.screen='detail'; st.ben=arg||'hold'; }
+  if(s==='end'){ st.screen='end'; st.end={step:arg||'reason', reason:'away', hist:[], date:5, pre:true}; }
   if(s==='home' && arg) HV=arg;
   if(s==='expired' && arg==='opts') st.sheet='opts';
   if(s==='expired' && arg==='down') setTimeout(()=>{document.getElementById('scr').scrollTop=9999},50);
