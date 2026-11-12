@@ -492,6 +492,7 @@
   .trust .tt small{display:block;font-size:13px;font-weight:400;color:var(--b);margin-top:3px}
   .trust div{padding:12px 0;align-items:center}
   .homelink{display:block;margin:22px auto 8px;font-size:14px;font-weight:500;color:var(--b);text-decoration:underline}
+  .cta.grey{background:#ECEAE7;color:#5E5E5E;margin-top:10px}
 
   /* ===== phone test mode ===== */
   html,body{height:100%}
@@ -776,7 +777,8 @@ function endScreen(){
       <div class="pbsub">₹${PREBOOK+CREDIT} ready for your next booking, whenever you come back.</div>
     </div>
     <div class="rules trust">
-      <div><span>✅</span><span class="tt">No cancellation charges<small>₹${PREBOOK} instantly paid back on cancellation</small></span></div>
+      <div><span>✅</span><span class="tt">No cancellation charges<small>Cancel anytime from the app</small></span></div>
+      <div><span>⚡</span><span class="tt">Instant refund<small>₹${PREBOOK} instantly refunded on cancellation</small></span></div>
       <div><span>🛵</span><span class="tt">EV kept ready<small>Priority pickup when you're back</small></span></div>
       <div><span>🏅</span><span class="tt">Continue Bounce Days from ${DAYS}<small>All your earned benefits stay when you're back</small></span></div>
     </div>`;
@@ -799,7 +801,7 @@ function endScreen(){
 }
 function endBar(){
   const E = st.end;
-  if(E.step==='prebook') return `<div class="ctabar"><button class="cta" data-a="endPre">Reserve now & get ₹${PREBOOK+CREDIT}</button><button class="lnk2" data-a="endSkip">Skip, return the EV</button></div>`;
+  if(E.step==='prebook') return `<div class="ctabar"><button class="cta" data-a="endPre">Reserve now & get ₹${PREBOOK+CREDIT}</button><button class="cta grey" data-a="endSkip">Skip, return the EV</button></div>`;
   return '';
 }
 
