@@ -485,6 +485,13 @@
   .allhubs{display:block;width:100%;text-align:left;margin:10px 2px 0;font-size:14px;color:var(--b)}
   .allhubs span{color:var(--red);font-weight:500}
   .raised{padding:20px 16px}
+  .scr.detail .sec{margin-top:32px}
+  .pbbig{line-height:1.5 !important}
+  .pbsub{margin-top:10px !important;line-height:1.5}
+  .trust .tt{display:block;font-size:15px;font-weight:500;color:var(--h);line-height:1.3}
+  .trust .tt small{display:block;font-size:13px;font-weight:400;color:var(--b);margin-top:3px}
+  .trust div{padding:12px 0;align-items:center}
+  .homelink{display:block;margin:22px auto 8px;font-size:14px;font-weight:500;color:var(--b);text-decoration:underline}
 
   /* ===== phone test mode ===== */
   html,body{height:100%}
@@ -761,18 +768,17 @@ function endScreen(){
     <div class="es" style="margin:-4px 2px 10px">We promise to fix the issue or exchange your EV right away</div>
     <div class="bl">${actRow('🎧','Talk to us','Chat or call our support team','Opens support chat')}</div>
     <div class="sec">Still want to return?</div>
-    <div class="es" style="margin:-4px 2px 0">We understand. Your ${DAYS} Bounce Days stay with you, and you can come back anytime.</div>
-    <button class="cta ghost" style="margin-top:12px" data-a="endNext" data-v="prebook">Continue to return EV</button>`;
+    <div class="es" style="margin:-4px 2px 10px">We understand. Your ${DAYS} Bounce Days stay with you.</div>
+    <div class="bl"><button class="bi opt" data-a="endNext" data-v="prebook"><span class="em c-red">🗝️</span><span class="tx"><b>Continue to return EV</b><small>You can come back anytime</small></span><span class="arr">›</span></button></div>`;
   if(E.step==='prebook') return head + `
     <div class="pbhero">
       <div class="pbbig">Reserve your EV with ₹${PREBOOK}<br><span>Bounce adds ₹${CREDIT}</span></div>
-      <div class="pbsub">₹${PREBOOK+CREDIT} ready for your next booking.</div>
+      <div class="pbsub">₹${PREBOOK+CREDIT} ready for your next booking, whenever you come back.</div>
     </div>
     <div class="rules trust">
-      <div><span>✅</span><span><b>No cancellation charges.</b> Cancel anytime from the app.</span></div>
-      <div><span>⚡</span><span><b>Instant refund</b> of your ₹${PREBOOK} to where you paid from.</span></div>
-      <div><span>🛵</span><span><b>EV kept ready</b> at your hub when you're back.</span></div>
-      <div><span>🏅</span><span><b>Continue from Day ${DAYS}</b> with all your benefits.</span></div>
+      <div><span>✅</span><span class="tt">No cancellation charges<small>₹${PREBOOK} instantly paid back on cancellation</small></span></div>
+      <div><span>🛵</span><span class="tt">EV kept ready<small>Priority pickup when you're back</small></span></div>
+      <div><span>🏅</span><span class="tt">Continue Bounce Days from ${DAYS}<small>All your earned benefits stay when you're back</small></span></div>
     </div>`;
   // request raised
   return head + `
@@ -788,7 +794,8 @@ function endScreen(){
     <div class="bl">
       <button class="bi opt" data-a="toast" data-v="Opens recharge"><span class="em c-red">⚡</span><span class="tx"><b>Recharge</b><small>Pick a plan and keep riding</small></span><span class="arr">›</span></button>
       <button class="bi opt" data-a="openBen"><span class="em c-red">🎁</span><span class="tx"><b>Use your benefits</b><small>${DAYS} Bounce Days of benefits</small></span><span class="arr">›</span></button>
-    </div>`;
+    </div>
+    <button class="homelink" data-a="home">Go to home</button>`;
 }
 function endBar(){
   const E = st.end;
