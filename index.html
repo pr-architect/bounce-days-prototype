@@ -463,6 +463,23 @@
   .hubcard b{font-size:16px;font-weight:600;display:block}.hubcard small{font-size:13px;color:var(--b)}
   .okband{margin-top:16px;background:var(--green-bg);color:#14562f;border-radius:16px;padding:12px 14px;font-size:14px;line-height:1.4}
   .ctabar .lnk2{display:block;width:100%;text-align:center;margin-top:12px;font-size:14px;font-weight:500;color:var(--b)}
+  .pbhero{margin-top:4px;border-radius:22px;padding:20px 18px;background:linear-gradient(150deg,#EAF6EE,#D3EDDC);border:1px solid #BFDFCA}
+  .pbtag{display:inline-block;background:#fff;color:#185C33;font-size:13px;font-weight:600;padding:4px 10px;border-radius:12px}
+  .pbbig{font-size:24px;font-weight:700;line-height:1.25;margin-top:12px;color:#14432A}
+  .pbbig span{color:var(--green)}
+  .pbsub{font-size:14px;color:#2F5C40;margin-top:8px;line-height:1.4}
+  .trust{margin-top:14px}
+  .trust div{align-items:flex-start}
+  .trust b{font-weight:600;color:var(--h)}
+  .notsure{display:block;width:100%;margin-top:8px;border:1.5px solid #EEEAE5;background:#fff;border-radius:12px;padding:10px;font-size:14px;font-weight:500;text-align:center;color:var(--b)}
+  .notsure.on{border-color:var(--red);background:#FFF5F5;color:var(--red)}
+  .raised{margin-top:4px;background:#fff;border-radius:22px;padding:22px 16px;text-align:center}
+  .raised .tick{width:52px;height:52px;border-radius:50%;background:var(--green-bg);color:var(--green);display:grid;place-items:center;font-size:24px;font-weight:700;margin:0 auto 12px}
+  .raised .code{font-size:32px;letter-spacing:6px;font-weight:700;margin-top:14px;background:#F7F5F2;border-radius:14px;padding:10px}
+  .infobox{margin-top:14px;background:#FFF8EC;border:1px solid #F2DFB0;border-radius:16px;padding:4px 14px}
+  .infobox div{display:flex;gap:10px;padding:11px 0;font-size:14px;color:#5A4415;line-height:1.4}
+  .infobox div+div{border-top:1px solid #F2E4C4}
+  .infobox b{color:#3D2C08}
 
   /* ===== phone test mode ===== */
   html,body{height:100%}
@@ -720,63 +737,68 @@ function ctabar(){
 }
 
 /* ===== end-booking flow ===== */
-const credit = () => DAYS <= 55 ? 200 : DAYS <= 180 ? 400 : 600;
-const PREBOOK = 1000;
-const REASONS = [
-  ['cash','👛','Short on cash right now'],
-  ['break','🌴','Taking a short break'],
-  ['ev','🔧','Problem with my EV'],
-  ['away','🧳','Going home for a while'],
-  ['done','👋','Done riding for now'],
-];
-const BEFORE = {
-  cash:  {t:"Short on cash? You don't have to return the EV", rows:[['ben','bnpl'],['ben','emi']]},
-  break: {t:'Taking a break? Keep your EV instead', rows:[['ben','hold'],['ben','ext']]},
-  ev:    {t:"Let's fix the EV instead", rows:[['act','🔁','Swap your EV at the hub','Get a different EV today','EV swap booked at your hub'],['act','🎧','Talk to us','Chat or call support','Opens support chat']]},
-  away:  {t:'Before you go', rows:[['ben','hold'],['ben','ext']]},
-  done:  {t:'Before you go', rows:[['ben','ext'],['ben','bnpl']]},
-};
-function dates(){ const out=[]; for(let i=1;i<=15;i++){ const d=new Date(2026,9,16+i); out.push({k:i, m:d.toLocaleString('en',{month:'short'}), n:d.getDate()}); } return out; }
+const PREBOOK = 500, CREDIT = 300;
+const locked = () => HS === 'expired';
+const lockLine = () => locked()
+  ? 'Your EV is unlocked for 2 hours to ride to a hub. It locks again at <b>6:40 PM today</b>.'
+  : 'Your EV keeps working till your plan ends. It locks on <b>20 Oct, 10:30 PM</b>.';
+function dates(){ const out=[]; for(let i=1;i<=10;i++){ const d=new Date(2026,9,16+i); out.push({k:i, m:d.toLocaleString('en',{month:'short'}), n:d.getDate()}); } return out; }
+const benRow = k => { const b=BEN[k]; return `<button class="bi opt" data-a="openDetail" data-v="${k}"><span class="em c-${b.c}">${b.e}</span><span class="tx"><b>${b.name}</b><small>${b.short}</small></span><span class="arr">›</span></button>`; };
+const actRow = (e,t,sub,msg) => `<button class="bi opt" data-a="toast" data-v="${msg}"><span class="em c-red">${e}</span><span class="tx"><b>${t}</b><small>${sub}</small></span><span class="arr">›</span></button>`;
+
 function endScreen(){
   const E = st.end, head = `<div class="back"><button data-a="endBack">‹</button><h3>Return EV</h3></div>`;
-  if(E.step==='reason') return head + `<div class="eh">Why are you returning your EV?</div><div class="es">One tap. It helps us help you.</div>
-    <div class="bl" style="margin-top:18px">${REASONS.map(([k,e,t])=>`<button class="bi" data-a="endReason" data-v="${k}"><span class="em c-red">${e}</span><span class="tx"><b>${t}</b></span><span class="arr">›</span></button>`).join('')}</div>`;
-  if(E.step==='before'){ const B = BEFORE[E.reason];
-    return head + `<div class="eh">${B.t}</div><div class="es">Your ${DAYS} Bounce Days have earned you these.</div>
-    <div class="bl" style="margin-top:18px">${B.rows.map(r=> r[0]==='ben'
-      ? (b=>`<button class="bi opt" data-a="openDetail" data-v="${r[1]}"><span class="em c-${b.c}">${b.e}</span><span class="tx"><b>${b.name}</b><small>${b.short}</small></span><span class="arr">›</span></button>`)(BEN[r[1]])
-      : `<button class="bi opt" data-a="toast" data-v="${r[4]}"><span class="em c-red">${r[1]}</span><span class="tx"><b>${r[2]}</b><small>${r[3]}</small></span><span class="arr">›</span></button>`).join('')}</div>`; }
-  if(E.step==='keep') return head + `<div class="keepcard">${bdIcon()}<div class="big">Your ${DAYS} Bounce Days stay with you</div><p>Come back whenever you can. You continue from Day ${DAYS}.</p></div>
-    <div class="rules" style="margin-top:14px">
-      <div><span>✅</span>All your earned benefits stay safe</div>
-      <div><span>🗓️</span>Come back anytime, continue from Day ${DAYS}</div>
-      <div><span>📄</span>No documents needed again</div></div>`;
-  if(E.step==='prebook'){ const c=credit();
-    return head + `<div class="eh">Pre-book your comeback</div><div class="es">Pay ₹${PREBOOK.toLocaleString('en-IN')} now. Bounce adds ₹${c} for your ${DAYS} Bounce Days.</div>
-    <div class="paycard">
-      <div class="rowp"><span>You pay</span><b>₹${PREBOOK.toLocaleString('en-IN')}</b></div>
-      <div class="rowp"><span>Bounce adds</span><b style="color:var(--green)">+ ₹${c}</b></div>
-      <div class="rowp tot"><span>Ready for your first plan back</span><b>₹${(PREBOOK+c).toLocaleString('en-IN')}</b></div>
-      <div class="tiers"><div class="${DAYS<=55?'on':''}"><b>₹200</b>Up to Day 55</div><div class="${DAYS>55&&DAYS<=180?'on':''}"><b>₹400</b>Day 56 to 180</div><div class="${DAYS>180?'on':''}"><b>₹600</b>Day 181+</div></div>
+  if(E.step==='before') return head + `
+    <div class="eh">Before you return</div>
+    <div class="es">Your ${DAYS} Bounce Days have earned you a few ways to keep riding.</div>
+    <div class="sec">Short on cash?</div>
+    <div class="bl">${benRow('bnpl')}${benRow('emi')}${benRow('ext')}</div>
+    <div class="sec">Problem with your EV?</div>
+    <div class="es" style="margin:-4px 2px 10px">Tell us. Most issues are fixed the same day.</div>
+    <div class="bl">${actRow('🔁','Swap your EV','Get a different EV at your hub today','EV swap booked at your hub')}${actRow('🎧','Talk to us','Tell us what went wrong, we will try to fix it','Opens support chat')}</div>
+    <div class="sec">No problem, but still want to return?</div>
+    <div class="es" style="margin:-4px 2px 0">That's fine. Your ${DAYS} Bounce Days stay with you, and you can come back anytime.</div>`;
+  if(E.step==='prebook'){ return head + `
+    <div class="pbhero">
+      <div class="pbtag">For your comeback</div>
+      <div class="pbbig">Pre-book for ₹${PREBOOK}<br><span>we add ₹${CREDIT}</span></div>
+      <div class="pbsub">₹${PREBOOK+CREDIT} ready for your first plan when you're back, plus an EV kept ready for you.</div>
     </div>
-    <div class="sec">When are you coming back?</div>
+    <div class="rules trust">
+      <div><span>✅</span><span><b>No cancellation charges.</b> Cancel anytime from the app.</span></div>
+      <div><span>⚡</span><span><b>Instant refund</b> of your ₹${PREBOOK} to where you paid from.</span></div>
+      <div><span>🛵</span><span><b>EV kept ready</b> at your hub, and a reminder a day before.</span></div>
+      <div><span>🏅</span><span><b>Continue from Day ${DAYS}</b> with all your benefits.</span></div>
+    </div>
+    <div class="sec">When do you plan to come back?</div>
     <div class="dgrid">${dates().map(d=>`<button class="${E.date===d.k?'on':''}" data-a="endDate" data-v="${d.k}">${d.m}<b>${d.n}</b></button>`).join('')}</div>
-    <p class="note">Cancel anytime and get your full ₹${PREBOOK.toLocaleString('en-IN')} back. We'll keep an EV ready and remind you a day before.</p>`; }
-  // summary
-  const d = E.date ? dates().find(x=>x.k===E.date) : null;
-  return head + `<div class="eh">Return your EV</div><div class="es">Ride to the hub and show this code to the hub team.</div>
-    ${E.pre ? `<div class="okband">✅ Comeback pre-booked for ${d.n} ${d.m}. ₹${(PREBOOK+credit()).toLocaleString('en-IN')} ready for your first plan back.</div>` : ''}
-    <div class="codebox"><small>Return code</small><b>4821</b></div>
-    <div class="hubcard"><span class="em c-red" style="width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:20px">📍</span><span style="flex:1"><b>HSR Layout Hub</b><small>2.1 km away · open till 9 PM</small></span><span class="lnk">Map ›</span></div>
-    <div class="steps" style="margin-top:16px"><div><span class="n">1</span>Ride to the hub</div><div><span class="n">2</span>Show the return code</div><div><span class="n">3</span>Hub team checks the EV, and you're done</div></div>`;
+    <button class="notsure ${E.date==='u'?'on':''}" data-a="endDate" data-v="u">Not sure yet</button>`; }
+  // request raised
+  const d = (E.date && E.date!=='u') ? dates().find(x=>x.k===E.date) : null;
+  return head + `
+    <div class="raised"><div class="tick">✓</div><div class="eh" style="margin:0">Return request raised</div>
+      <div class="es">Return your EV at any Bounce hub. Show this code to the hub team.</div>
+      <div class="code">4821</div></div>
+    ${E.pre ? `<div class="okband">✅ Comeback pre-booked${d?` for ${d.n} ${d.m}`:''}. ₹${PREBOOK+CREDIT} is ready for your first plan back.</div>` : ''}
+    <div class="sec">Nearest hub</div>
+    <div class="hubcard"><span class="em c-red" style="width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:20px">📍</span><span style="flex:1"><b>HSR Layout Hub</b><small>2.1 km away, open till 9 PM</small></span><span class="lnk">Map ›</span></div>
+    <p class="note" style="margin:8px 2px 0">You can return at <b>any Bounce hub</b>, not just this one.</p>
+    <div class="infobox">
+      <div><span>🔒</span><span>${lockLine()}</span></div>
+      <div><span>⚠️</span><span>If the EV isn't returned at a hub by then, our team will collect it. Your ${DAYS} Bounce Days and all your benefits reset to 0.</span></div>
+    </div>
+    <div class="sec">Changed your mind?</div>
+    <div class="bl">
+      <button class="bi opt" data-a="endCancel"><span class="em c-red">↩️</span><span class="tx"><b>Cancel return request</b><small>Keep riding as before</small></span><span class="arr">›</span></button>
+      <button class="bi opt" data-a="openBen"><span class="em c-red">🎁</span><span class="tx"><b>See your benefits</b><small>${DAYS} Bounce Days of benefits to use</small></span><span class="arr">›</span></button>
+      <button class="bi opt" data-a="toast" data-v="Opens recharge"><span class="em c-red">⚡</span><span class="tx"><b>Recharge instead</b><small>Pick a plan and keep riding</small></span><span class="arr">›</span></button>
+    </div>`;
 }
 function endBar(){
   const E = st.end;
-  if(E.step==='reason') return '';
-  if(E.step==='before') return `<div class="ctabar"><button class="cta ghost" data-a="endNext" data-v="keep">No thanks, continue to return</button></div>`;
-  if(E.step==='keep') return `<div class="ctabar"><button class="cta" data-a="endNext" data-v="prebook">Continue</button></div>`;
-  if(E.step==='prebook') return `<div class="ctabar"><button class="cta" data-a="endPre" ${E.date?'':'disabled'}>${E.date?`Pay ₹${PREBOOK.toLocaleString('en-IN')} and pre-book`:'Pick a return date'}</button><button class="lnk2" data-a="endSkip">Skip, just return the EV</button></div>`;
-  return `<div class="ctabar"><button class="cta" data-a="toast" data-v="Opens map to HSR Layout Hub">Navigate to hub</button><button class="lnk2" data-a="home">Done</button></div>`;
+  if(E.step==='before') return `<div class="ctabar"><button class="cta ghost" data-a="endNext" data-v="prebook">Continue to return EV</button></div>`;
+  if(E.step==='prebook') return `<div class="ctabar"><button class="cta" data-a="endPre" ${E.date?'':'disabled'}>${E.date?`Pre-book for ₹${PREBOOK}`:'Pick when you plan to come back'}</button><button class="lnk2" data-a="endSkip">Skip, just return the EV</button></div>`;
+  return `<div class="ctabar"><button class="cta" data-a="toast" data-v="Opens map to HSR Layout Hub">Navigate to hub</button></div>`;
 }
 
 /* ===== render ===== */
@@ -818,10 +840,11 @@ document.getElementById('phone').addEventListener('click', e=>{
     case 'closePop': st.pop = null; render(true); break;
     case 'openDetail': st.sheet = null; st.from = st.screen; st.ben = v; st.pop = null; st.screen = 'detail'; st.benY = document.getElementById('scr').scrollTop; render(); break;
     case 'backFromDetail': st.screen = st.from==='home' ? 'home' : st.from==='end' ? 'end' : 'ben'; render(); break;
-    case 'startEnd': st = {screen:'end', pop:null, end:{step:'reason'}}; render(); break;
+    case 'startEnd': st = {screen:'end', pop:null, end:{step:'before', hist:[]}}; render(); break;
+    case 'endCancel': st = {screen:'home', pop:null}; render(); toast('Return request cancelled. Keep riding!'); break;
     case 'endReason': st.end.reason = v; st.end.hist=['reason']; st.end.step='before'; render(); break;
     case 'endNext': st.end.hist.push(st.end.step); st.end.step = v; render(); break;
-    case 'endDate': st.end.date = +v; render(true); break;
+    case 'endDate': st.end.date = (v==='u') ? 'u' : +v; render(true); break;
     case 'endPre': st.end.pre = true; st.end.hist.push(st.end.step); st.end.step='summary'; render(); break;
     case 'endSkip': st.end.pre = false; st.end.hist.push(st.end.step); st.end.step='summary'; render(); break;
     case 'endBack': if(st.end.hist && st.end.hist.length){ st.end.step = st.end.hist.pop(); render(); } else { st = {screen:'home', pop:null}; render(); } break;
@@ -843,7 +866,7 @@ document.getElementById('resetBtn').onclick = ()=>{ st={screen:'home',pop:null};
   const [s,arg] = location.hash.slice(1).split(':');
   if(s==='ben'){ st.screen='ben'; if(arg!==undefined) st.pop=+arg; }
   if(s==='detail'){ st.screen='detail'; st.ben=arg||'hold'; }
-  if(s==='end'){ st.screen='end'; st.end={step:arg||'reason', reason:'away', hist:[], date:5, pre:true}; }
+  if(s==='end'){ st.screen='end'; st.end={step:arg||'before', hist:[], date:5, pre:true}; }
   if(s==='home' && arg) HV=arg;
   if(s==='expired' && arg==='opts') st.sheet='opts';
   if(s==='expired' && arg==='down') setTimeout(()=>{document.getElementById('scr').scrollTop=9999},50);
