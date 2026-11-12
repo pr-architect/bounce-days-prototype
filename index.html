@@ -465,7 +465,7 @@
   .ctabar .lnk2{display:block;width:100%;text-align:center;margin-top:12px;font-size:14px;font-weight:500;color:var(--b)}
   .pbhero{margin-top:4px;border-radius:22px;padding:20px 18px;background:linear-gradient(150deg,#EAF6EE,#D3EDDC);border:1px solid #BFDFCA}
   .pbtag{display:inline-block;background:#fff;color:#185C33;font-size:13px;font-weight:600;padding:4px 10px;border-radius:12px}
-  .pbbig{font-size:24px;font-weight:700;line-height:1.25;margin-top:12px;color:#14432A}
+  .pbbig{font-size:22px;font-weight:700;line-height:1.3;color:#14432A;white-space:nowrap}
   .pbbig span{color:var(--green)}
   .pbsub{font-size:14px;color:#2F5C40;margin-top:8px;line-height:1.4}
   .trust{margin-top:14px}
@@ -480,6 +480,11 @@
   .infobox div{display:flex;gap:10px;padding:11px 0;font-size:14px;color:#5A4415;line-height:1.4}
   .infobox div+div{border-top:1px solid #F2E4C4}
   .infobox b{color:#3D2C08}
+  .hubline{display:flex;align-items:center;gap:10px;width:100%;margin-top:14px;background:#fff;border-radius:16px;padding:14px 16px;font-size:14px;text-align:left}
+  .hubline .tx{flex:1;color:var(--b)} .hubline b{color:var(--h);font-weight:600}
+  .allhubs{display:block;width:100%;text-align:left;margin:10px 2px 0;font-size:14px;color:var(--b)}
+  .allhubs span{color:var(--red);font-weight:500}
+  .raised{padding:20px 16px}
 
   /* ===== phone test mode ===== */
   html,body{height:100%}
@@ -749,56 +754,46 @@ const actRow = (e,t,sub,msg) => `<button class="bi opt" data-a="toast" data-v="$
 function endScreen(){
   const E = st.end, head = `<div class="back"><button data-a="endBack">‹</button><h3>Return EV</h3></div>`;
   if(E.step==='before') return head + `
-    <div class="eh">Before you return</div>
-    <div class="es">Your ${DAYS} Bounce Days have earned you a few ways to keep riding.</div>
-    <div class="sec">Short on cash?</div>
+    <div class="sec" style="margin-top:6px">Short on cash?</div>
+    <div class="es" style="margin:-4px 2px 10px">Your ${DAYS} Bounce Days have earned these benefits</div>
     <div class="bl">${benRow('bnpl')}${benRow('emi')}${benRow('ext')}</div>
     <div class="sec">Problem with your EV?</div>
-    <div class="es" style="margin:-4px 2px 10px">Tell us. Most issues are fixed the same day.</div>
-    <div class="bl">${actRow('🔁','Swap your EV','Get a different EV at your hub today','EV swap booked at your hub')}${actRow('🎧','Talk to us','Tell us what went wrong, we will try to fix it','Opens support chat')}</div>
-    <div class="sec">No problem, but still want to return?</div>
-    <div class="es" style="margin:-4px 2px 0">That's fine. Your ${DAYS} Bounce Days stay with you, and you can come back anytime.</div>`;
-  if(E.step==='prebook'){ return head + `
+    <div class="es" style="margin:-4px 2px 10px">We promise to fix the issue or exchange your EV right away</div>
+    <div class="bl">${actRow('🎧','Talk to us','Chat or call our support team','Opens support chat')}</div>
+    <div class="sec">Still want to return?</div>
+    <div class="es" style="margin:-4px 2px 0">We understand. Your ${DAYS} Bounce Days stay with you, and you can come back anytime.</div>
+    <button class="cta ghost" style="margin-top:12px" data-a="endNext" data-v="prebook">Continue to return EV</button>`;
+  if(E.step==='prebook') return head + `
     <div class="pbhero">
-      <div class="pbtag">For your comeback</div>
-      <div class="pbbig">Pre-book for ₹${PREBOOK}<br><span>we add ₹${CREDIT}</span></div>
-      <div class="pbsub">₹${PREBOOK+CREDIT} ready for your first plan when you're back, plus an EV kept ready for you.</div>
+      <div class="pbbig">Reserve your EV with ₹${PREBOOK}<br><span>Bounce adds ₹${CREDIT}</span></div>
+      <div class="pbsub">₹${PREBOOK+CREDIT} ready for your next booking.</div>
     </div>
     <div class="rules trust">
       <div><span>✅</span><span><b>No cancellation charges.</b> Cancel anytime from the app.</span></div>
       <div><span>⚡</span><span><b>Instant refund</b> of your ₹${PREBOOK} to where you paid from.</span></div>
-      <div><span>🛵</span><span><b>EV kept ready</b> at your hub, and a reminder a day before.</span></div>
+      <div><span>🛵</span><span><b>EV kept ready</b> at your hub when you're back.</span></div>
       <div><span>🏅</span><span><b>Continue from Day ${DAYS}</b> with all your benefits.</span></div>
-    </div>
-    <div class="sec">When do you plan to come back?</div>
-    <div class="dgrid">${dates().map(d=>`<button class="${E.date===d.k?'on':''}" data-a="endDate" data-v="${d.k}">${d.m}<b>${d.n}</b></button>`).join('')}</div>
-    <button class="notsure ${E.date==='u'?'on':''}" data-a="endDate" data-v="u">Not sure yet</button>`; }
+    </div>`;
   // request raised
-  const d = (E.date && E.date!=='u') ? dates().find(x=>x.k===E.date) : null;
   return head + `
-    <div class="raised"><div class="tick">✓</div><div class="eh" style="margin:0">Return request raised</div>
-      <div class="es">Return your EV at any Bounce hub. Show this code to the hub team.</div>
-      <div class="code">4821</div></div>
-    ${E.pre ? `<div class="okband">✅ Comeback pre-booked${d?` for ${d.n} ${d.m}`:''}. ₹${PREBOOK+CREDIT} is ready for your first plan back.</div>` : ''}
-    <div class="sec">Nearest hub</div>
-    <div class="hubcard"><span class="em c-red" style="width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:20px">📍</span><span style="flex:1"><b>HSR Layout Hub</b><small>2.1 km away, open till 9 PM</small></span><span class="lnk">Map ›</span></div>
-    <p class="note" style="margin:8px 2px 0">You can return at <b>any Bounce hub</b>, not just this one.</p>
+    <div class="raised"><div class="tick">✓</div><div class="eh" style="margin:0">Return request raised</div></div>
+    ${E.pre ? `<div class="okband">✅ EV reserved. ₹${PREBOOK+CREDIT} is ready for your next booking.</div>` : ''}
+    <button class="hubline" data-a="toast" data-v="Opens navigation to HSR Layout Hub"><span>📍</span><span class="tx">Nearest hub: <b>HSR Layout Hub</b>, 2.1 km</span><span class="lnk">Navigate ›</span></button>
+    <button class="allhubs" data-a="toast" data-v="Shows all Bounce hubs on a map">You can return at any Bounce hub. <span>See all hubs ›</span></button>
     <div class="infobox">
       <div><span>🔒</span><span>${lockLine()}</span></div>
-      <div><span>⚠️</span><span>If the EV isn't returned at a hub by then, our team will collect it. Your ${DAYS} Bounce Days and all your benefits reset to 0.</span></div>
+      <div><span>⚠️</span><span>If the EV isn't returned at a hub by then, it gets locked. Your Bounce Days benefits can help in that case. If it's still not returned, your ${DAYS} Bounce Days and all your benefits reset to 0.</span></div>
     </div>
     <div class="sec">Changed your mind?</div>
     <div class="bl">
-      <button class="bi opt" data-a="endCancel"><span class="em c-red">↩️</span><span class="tx"><b>Cancel return request</b><small>Keep riding as before</small></span><span class="arr">›</span></button>
-      <button class="bi opt" data-a="openBen"><span class="em c-red">🎁</span><span class="tx"><b>See your benefits</b><small>${DAYS} Bounce Days of benefits to use</small></span><span class="arr">›</span></button>
-      <button class="bi opt" data-a="toast" data-v="Opens recharge"><span class="em c-red">⚡</span><span class="tx"><b>Recharge instead</b><small>Pick a plan and keep riding</small></span><span class="arr">›</span></button>
+      <button class="bi opt" data-a="toast" data-v="Opens recharge"><span class="em c-red">⚡</span><span class="tx"><b>Recharge</b><small>Pick a plan and keep riding</small></span><span class="arr">›</span></button>
+      <button class="bi opt" data-a="openBen"><span class="em c-red">🎁</span><span class="tx"><b>Use your benefits</b><small>${DAYS} Bounce Days of benefits</small></span><span class="arr">›</span></button>
     </div>`;
 }
 function endBar(){
   const E = st.end;
-  if(E.step==='before') return `<div class="ctabar"><button class="cta ghost" data-a="endNext" data-v="prebook">Continue to return EV</button></div>`;
-  if(E.step==='prebook') return `<div class="ctabar"><button class="cta" data-a="endPre" ${E.date?'':'disabled'}>${E.date?`Pre-book for ₹${PREBOOK}`:'Pick when you plan to come back'}</button><button class="lnk2" data-a="endSkip">Skip, just return the EV</button></div>`;
-  return `<div class="ctabar"><button class="cta" data-a="toast" data-v="Opens map to HSR Layout Hub">Navigate to hub</button></div>`;
+  if(E.step==='prebook') return `<div class="ctabar"><button class="cta" data-a="endPre">Reserve now & get ₹${PREBOOK+CREDIT}</button><button class="lnk2" data-a="endSkip">Skip, return the EV</button></div>`;
+  return '';
 }
 
 /* ===== render ===== */
